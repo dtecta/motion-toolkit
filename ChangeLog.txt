@@ -1,0 +1,10 @@
+2012-03-20: version 0.2.1
+	Added an example on how to use dual numbers for computing
+	second-order derivatives, as a follow up on a question asked 
+	at my GDC 2012 dual numbers talk.
+
+
+2012-03-06:	version 0.2
+	GDC 2012 release accompanying my talk "Math for Game Programmmers
+	Tutorial: Dual Numbers" 
+	
