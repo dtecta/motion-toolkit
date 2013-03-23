@@ -1,3 +1,5 @@
+2013-03-23: Imported the motion toolkit into a Google code repository.
+
 2012-03-20: version 0.2.1
 	Added an example on how to use dual numbers for computing
 	second-order derivatives, as a follow up on a question asked 
