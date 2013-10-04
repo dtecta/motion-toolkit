@@ -38,13 +38,16 @@ namespace mt
         typedef Scalar ScalarType; 
       
         Vector4();
-        Vector4(Scalar x, Scalar y, Scalar z, Scalar w);     
+        Vector4(Scalar x, Scalar y, Scalar z, Scalar w);  
+        
         Vector4(Zero);
         Vector4(Identity);
-        template <int I> Vector4(Unit<I>);
+        template <int I> Vector4(Unit<I>); 
+      
         template <typename Scalar2> explicit Vector4(const Scalar2* v);   
         template <typename Scalar2> Vector4(const Vector4<Scalar2>& a);
-        template <typename Scalar2> Vector4(const Vector3<Scalar2>& a, Scalar w = Scalar());
+        template <typename Scalar2> explicit Vector4(const Vector3<Scalar2>& a, Scalar w = Scalar());
+        explicit Vector4(Scalar w); 
         
         operator const Scalar*() const;
         operator Scalar*();
@@ -187,7 +190,7 @@ namespace mt
  
     template <typename Scalar> void decomposeZ(const Vector4<Scalar>& q, Vector4<Scalar>& qxy, Vector4<Scalar>& qz);
 
-
+    template <typename Scalar> bool isfinite(const Vector4<Scalar>& a);
 
 
 
@@ -261,6 +264,15 @@ namespace mt
         : x(Scalar(a.x))
         , y(Scalar(a.y))
         , z(Scalar(a.z))
+        , w(w)
+    {}  
+
+    template <typename Scalar>
+    FORCEINLINE
+    Vector4<Scalar>::Vector4(Scalar w)
+        : x()
+        , y()
+        , z()
         , w(w)
     {}
     
@@ -353,7 +365,7 @@ namespace mt
         x = Scalar(a.x);
         y = Scalar(a.y);
         z = Scalar(a.z);
-        z = Scalar(a.w);
+        w = Scalar(a.w);
         return *this;
     }
 
@@ -861,6 +873,12 @@ namespace mt
                              Scalar(), 
                              q.z * r, 
                              q.w * r); 
+    }
+
+    template <typename Scalar>
+    bool isfinite(const Vector4<Scalar>& a)
+    {
+        return isfinite(a.x) && isfinite(a.y) && isfinite(a.z) && isfinite(a.w); 
     }
 
 }

@@ -62,6 +62,22 @@ T smoothstepprime(T x)
 } 
 
 
+template <typename Vector>
+bool fuzzyEqual(const Vector& lhs, const Vector& rhs)
+{
+    return lengthSquared(lhs - rhs) < ScalarTraits::epsilon();
+}
+
+bool fuzzyEqual(const DualQuaternion& lhs, const DualQuaternion& rhs)
+{
+    return fuzzyEqual(real(lhs), real(rhs)) && fuzzyEqual(dual(lhs), dual(rhs));
+}
+
+bool fuzzyEqual(const DualVector3& lhs, const DualVector3& rhs)
+{
+    return fuzzyEqual(real(lhs), real(rhs)) && fuzzyEqual(dual(lhs), dual(rhs));
+}
+
 int main()
 {  
     Dual z1; // zero initialized
@@ -102,7 +118,7 @@ int main()
         std::cout << "x = " << x << "\tf'(x) = " << smoothstepprime(x) << std::endl;
     }
 
-    // We can compute the second-order derivative by calling smottstepprime using a dual number. 
+    // We can compute the second-order derivative by calling smoothstepprime using a dual number. 
     for (int k = 0; k != 11; ++k)
     {
         Scalar x = Scalar(k) / Scalar(10);
@@ -197,7 +213,7 @@ int main()
     DualVector3 tlinepq2 = mul(xform, linep1q1);
 
     // tlinepq and tlinepg2 should be equal give or take a few rounding differences      
-    ASSERT(lengthSquared(tlinepq - tlinepq2) < ScalarTraits::epsilon());
+    ASSERT(fuzzyEqual(tlinepq, tlinepq2));
 
 
     // DUAL QUATERNIONS
@@ -208,18 +224,18 @@ int main()
     // Rotation and translation can be retrieved from a dual quaternion.
 
     Quaternion orn1 = rotation(dq);
-    ASSERT(lengthSquared(orn - orn1) < ScalarTraits::epsilon());
+    ASSERT(fuzzyEqual(orn, orn1));
 
     Vector3 origin1 = translation(dq);
-    ASSERT(lengthSquared(origin - origin1) < ScalarTraits::epsilon());
+    ASSERT(fuzzyEqual(origin, origin1));
     
 
     // The function operator on (dual) quaternions performs the transformation: dq(x) = mul(dq, mul(x, conjugate(dq)))
     DualVector3 tlinepq3 = dq(linep1q1);
 
-    ASSERT(lengthSquared(tlinepq - tlinepq3) < ScalarTraits::epsilon());
+    ASSERT(fuzzyEqual(tlinepq, tlinepq3));
 
-    // Dual quaternions can be normalized, however, dq has already unit length
+    // Dual quaternions can be normalized, however, dq already has unit length
     DualQuaternion ndq = normalize(dq);
 
     DualQuaternion u = mul(dq, inverse(dq));
@@ -245,7 +261,7 @@ int main()
     // Before we begin, make sure we use the closest transformation
     if (mt::isnegative(dot(dq, dq2)))
     {
-        dq2 = -dq2; // dq2 and -dq2 are the same pose, but -dq2 is closer to dq and dq2
+        dq2 = -dq2; // dq2 and -dq2 are the same pose, but -dq2 is closer to dq than dq2 is.
     } 
 
     // Method #1: normalized lerp: normalize(lerp(dq, dq2, t)). 
@@ -289,7 +305,37 @@ int main()
     Vector3 tdp = xyz(dual(tdqp));
 
     // which is equal to tp1 as verified below.
-    ASSERT(lengthSquared(tp1 - tdp) < ScalarTraits::epsilon());
+    ASSERT(fuzzyEqual(tp1, tdp));
+
+   
+
+    DualVector3 localvel = makeDual(Vector3(0, 0, -1), Vector3(1, 0, 0));
+    DualQuaternion pose = rigid(Quaternion(Identity()), Vector3(0, 1, 0));
+    
+    Scalar step = Scalar(0.01);
+    for (int k = 0; k != 100; ++k)
+    {
+        Dual angle = acos(pose.w) * Dual(2);
+
+        std::cout << "Pose: " << pose << "Orientation: " << rotation(pose) << "\tPosition: " << translation(pose) << "\tAngle: " << angle << std::endl;
+
+        DualVector3 worldvel = pose(localvel);
+        DualQuaternion dPose = mul(worldvel, pose) * (step * Scalar(0.5));
+        pose = normalize(pose + dPose);
+      
+    }
+
+    Scalar theta = 1;
+    for (int k = 0; k != 12; ++k)
+    {
+        DualQuaternion dqt = rigid(axisAngle(Vector3(0, 1, 0), theta), Vector3(0, 0, 1));
+        DualVector3 logdqt = logUnit(dqt); 
+        DualQuaternion dqt2 = exp(logdqt);
+
+        ASSERT(fuzzyEqual(dqt, dqt2));
+
+        theta *= Scalar(0.5);
+    }
 
     getchar();
     

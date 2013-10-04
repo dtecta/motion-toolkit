@@ -31,6 +31,11 @@ namespace guts
             mRefCount = 0;
         }
 
+        RefCounted(const RefCounted&) 
+        {
+            mRefCount = 0;
+        }
+
         void increase()
         { 
             ++mRefCount; 

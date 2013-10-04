@@ -13,6 +13,8 @@ add_executable(moto
   Interval.hpp
   Matrix2x2.hpp
   Matrix3x3.hpp
+  Matrix3x4.hpp
+  Matrix3x4_SSE.hpp
   Matrix4x4.hpp
   Matrix4x4_SSE.hpp
   Metric.hpp

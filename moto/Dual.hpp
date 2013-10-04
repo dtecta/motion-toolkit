@@ -124,6 +124,7 @@ namespace mt
     template <typename Scalar> Dual<Scalar> tan(const Dual<Scalar>& z);
     template <typename Scalar> Dual<Scalar> tanh(const Dual<Scalar>& z);
 
+    template <typename Scalar> bool isfinite(const Dual<Scalar>& z);
 
 
     // Member functions
@@ -615,7 +616,14 @@ namespace mt
         {
             return Dual<Scalar>(ScalarTraits<Scalar>::max());
         }
-    };  
+    };   
+
+    template <typename Scalar>
+    bool isfinite(const Dual<Scalar>& z)
+    {
+        return isfinite(z.real()) && isfinite(z.dual());
+    }
+
 
 }
 

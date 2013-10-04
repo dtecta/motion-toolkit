@@ -123,7 +123,8 @@ namespace mt
     template <typename Scalar1, typename Scalar2>
     void convert(Scalar1* v, const Vector3<Scalar2>& a);
 
-
+    template <typename Scalar> bool isfinite(const Vector3<Scalar>& a);
+ 
  
 
 
@@ -491,6 +492,12 @@ namespace mt
         v[0] = Scalar1(a.x);
         v[1] = Scalar1(a.y);
         v[2] = Scalar1(a.z);
+    }  
+
+    template <typename Scalar>
+    bool isfinite(const Vector3<Scalar>& a)
+    {
+        return isfinite(a.x) && isfinite(a.y) && isfinite(a.z); 
     }
 }
 

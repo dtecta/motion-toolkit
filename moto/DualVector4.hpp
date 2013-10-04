@@ -17,7 +17,6 @@
 
 #include <moto/Dual.hpp>
 #include <moto/Vector4.hpp>
-#include <moto/Matrix4x4.hpp>
 
 namespace mt
 {
@@ -43,7 +42,10 @@ namespace mt
     template <typename Scalar> Vector4<Scalar> rotation(const Vector4<Dual<Scalar> >& q);
 
     // and "translation(q)" returns the translation part.
-    template <typename Scalar> Vector3<Scalar> translation(const Vector4<Dual<Scalar> >& q);
+    template <typename Scalar> Vector3<Scalar> translation(const Vector4<Dual<Scalar> >& q); 
+
+    template <typename Scalar> Vector3<Dual<Scalar> > logUnit(const Vector4<Dual<Scalar> >& q);
+    template <typename Scalar> Vector4<Dual<Scalar> > exp(const Vector3<Dual<Scalar> >& v);
     
 #ifdef USE_OSTREAM
     template <typename CharT, typename Traits, typename Scalar> 
@@ -101,6 +103,22 @@ namespace mt
     Vector3<Scalar> translation(const Vector4<Dual<Scalar> >& q)
     {
         return xyz(mul(dual(q), conjugate(real(q)))) * Scalar(2);
+    }
+
+    // This one is safe for dual quaternions with an identity real part
+    template <typename Scalar>
+    FORCEINLINE 
+    Vector3<Dual<Scalar> > logUnit(const Vector4<Dual<Scalar> >& q)
+    { 
+        return makeDual(logUnit(real(q)), xyz(mul(dual(q), conjugate(real(q)))));
+    }
+ 
+    template <typename Scalar>
+    FORCEINLINE 
+    Vector4<Dual<Scalar> > exp(const Vector3<Dual<Scalar> >& v)
+    { 
+        Vector4<Scalar> q = exp(real(v));
+        return makeDual(q, mul(dual(v), q));
     }
 
 #ifdef USE_OSTREAM

@@ -16,6 +16,7 @@
 #define MT_MATRIX4X4_HPP
 
 #include <moto/Matrix3x3.hpp>
+#include <moto/Matrix3x4.hpp>
 #include <moto/Vector4.hpp>
 #include <moto/Algebra.hpp>
 
@@ -31,9 +32,10 @@ namespace mt
         Matrix4x4(Identity);
         template <typename Scalar2> explicit Matrix4x4(const Scalar2* v);   
         Matrix4x4(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3);
-        Matrix4x4(const Vector4<Scalar>& c0, const Vector4<Scalar>& c1, const Vector4<Scalar>& c2, const Vector4<Scalar>& c3);
+        Matrix4x4(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2, const Vector4<Scalar>& r3);
         explicit Matrix4x4(const Vector3<Scalar>& p);
         explicit Matrix4x4(const Matrix3x3<Scalar>& a, const Vector3<Scalar>& p = Zero());
+        explicit Matrix4x4(const Matrix3x4<Scalar>& a);
         
         operator const Vector4<Scalar>*() const; 
         operator Vector4<Scalar>*();
@@ -41,30 +43,31 @@ namespace mt
         Matrix4x4<Scalar>& operator=(Identity);
 
         template <typename Scalar2> void setValue(const Scalar2* v);  
-        void setValue(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3);
-        void setValue(const Vector4<Scalar>& c0, const Vector4<Scalar>& c1, const Vector4<Scalar>& c2, const Vector4<Scalar>& c3);
+        void setColumns(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3);
+        void setColumns(const Vector4<Scalar>& c0, const Vector4<Scalar>& c1, const Vector4<Scalar>& c2, const Vector4<Scalar>& c3);
+
+        void setRows(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2, const Vector4<Scalar>& r3);
 
         void setBasis(const Matrix3x3<Scalar>& basis);
         void setOrigin(const Vector3<Scalar>& origin);
 
-        void setColumn(int i, const Vector3<Scalar>& v);
-        void setColumn(int i, const Vector4<Scalar>& v);
+        void setColumn(int j, const Vector3<Scalar>& v);
+        void setColumn(int j, const Vector4<Scalar>& v);
 
         void setRow(int i, const Vector3<Scalar>& v);
         void setRow(int i, const Vector4<Scalar>& v);
 
     private:
-        Vector4<Scalar> mCol[4];
+        Vector4<Scalar> mRow[4];
     }; 
 
     template <typename Scalar> bool operator==(const Matrix4x4<Scalar>& a, const Matrix4x4<Scalar>& b);
  
-    template <typename Scalar> Scalar tdot(const Matrix4x4<Scalar>& a, int i, const Vector4<Scalar>& v);
     template <int I, int J, typename Scalar> Scalar cofactor(const Matrix4x4<Scalar>& a);
 
     template <typename Scalar> Vector4<Scalar> row(const Matrix4x4<Scalar>& a, int i);
     template <typename Scalar> Matrix3x3<Scalar> basis(const Matrix4x4<Scalar>& a);
-    template <typename Scalar> const Vector3<Scalar>& origin(const Matrix4x4<Scalar>& a); 
+    template <typename Scalar> Vector3<Scalar> origin(const Matrix4x4<Scalar>& a); 
 
 
 #ifdef USE_OSTREAM
@@ -118,59 +121,69 @@ namespace mt
     FORCEINLINE 
     Matrix4x4<Scalar>::Matrix4x4(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3)
     {
-        setValue(c0, c1, c2, c3);
+        setColumns(c0, c1, c2, c3);
     }
    
 
     template <typename Scalar>
     FORCEINLINE 
-    Matrix4x4<Scalar>::Matrix4x4(const Vector4<Scalar>& c0, const Vector4<Scalar>& c1, const Vector4<Scalar>& c2, const Vector4<Scalar>& c3)
+    Matrix4x4<Scalar>::Matrix4x4(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2, const Vector4<Scalar>& r3)
     {
-        setValue(c0, c1, c2, c3);
+        setRows(r0, r1, r2, r3);
     }
 
     template <typename Scalar>
     FORCEINLINE 
     Matrix4x4<Scalar>::Matrix4x4(const Vector3<Scalar>& p)
     {
-        mCol[0] = Unit<0>();
-        mCol[1] = Unit<1>();
-        mCol[2] = Unit<2>();
-        mCol[3] = Vector4<Scalar>(p, Scalar(1));
+        mRow[0] = Vector4<Scalar>(Unit<0>(), p.x);
+        mRow[1] = Vector4<Scalar>(Unit<1>(), p.y);
+        mRow[2] = Vector4<Scalar>(Unit<2>(), p.z);
+        mRow[3] = Unit<3>();
     }
 
     template <typename Scalar>
     FORCEINLINE 
     Matrix4x4<Scalar>::Matrix4x4(const Matrix3x3<Scalar>& a, const Vector3<Scalar>& p)
     {
-        mCol[0] = Vector4<Scalar>(a[0][0], a[1][0], a[2][0], Scalar());
-        mCol[1] = Vector4<Scalar>(a[0][1], a[1][1], a[2][1], Scalar());
-        mCol[2] = Vector4<Scalar>(a[0][2], a[1][2], a[2][2], Scalar());
-        mCol[3] = Vector4<Scalar>(p, Scalar(1));
+        mRow[0] = Vector4<Scalar>(a[0], p.x);
+        mRow[1] = Vector4<Scalar>(a[1], p.y);
+        mRow[2] = Vector4<Scalar>(a[2], p.z);
+        mRow[3] = Unit<3>();
+    }
+   
+    template <typename Scalar>
+    FORCEINLINE 
+    Matrix4x4<Scalar>::Matrix4x4(const Matrix3x4<Scalar>& a)
+    {
+        mRow[0] = a[0];
+        mRow[1] = a[1];
+        mRow[2] = a[2];
+        mRow[3] = Unit<3>();
     }
     
     template <typename Scalar>
     FORCEINLINE
     Matrix4x4<Scalar>::operator const Vector4<Scalar>*() const
     {
-        return mCol;
+        return mRow;
     } 
 
     template <typename Scalar>
     FORCEINLINE
     Matrix4x4<Scalar>::operator Vector4<Scalar>*()
     {
-        return mCol;
+        return mRow;
     } 
    
     template <typename Scalar>
     FORCEINLINE 
     Matrix4x4<Scalar>& Matrix4x4<Scalar>::operator=(Identity)
     {
-        mCol[0] = Unit<0>();
-        mCol[1] = Unit<1>();
-        mCol[2] = Unit<2>();
-        mCol[3] = Unit<3>();
+        mRow[0] = Unit<0>();
+        mRow[1] = Unit<1>();
+        mRow[2] = Unit<2>();
+        mRow[3] = Unit<3>();
         return *this;
     }
 
@@ -180,41 +193,40 @@ namespace mt
     FORCEINLINE
     void Matrix4x4<Scalar>::setValue(const Scalar2* v)
     {
-        mCol[0] = Vector4<Scalar>(&v[0]); 
-        mCol[1] = Vector4<Scalar>(&v[4]); 
-        mCol[2] = Vector4<Scalar>(&v[8]); 
-        mCol[3] = Vector4<Scalar>(&v[12]); 
+		mRow[0] = Vector4<Scalar>(Scalar(v[0]), Scalar(v[4]), Scalar(v[8]), Scalar(v[12])); 
+        mRow[1] = Vector4<Scalar>(Scalar(v[1]), Scalar(v[5]), Scalar(v[9]), Scalar(v[13])); 
+        mRow[2] = Vector4<Scalar>(Scalar(v[2]), Scalar(v[6]), Scalar(v[10]), Scalar(v[14]));
+        mRow[3] = Vector4<Scalar>(Scalar(v[3]), Scalar(v[7]), Scalar(v[11]), Scalar(v[15])); 
     }  
 
     template <typename Scalar>
     FORCEINLINE 
-    void Matrix4x4<Scalar>::setValue(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3)
+    void Matrix4x4<Scalar>::setColumns(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3)
     {
-        mCol[0] = Vector4<Scalar>(c0, Scalar());
-        mCol[1] = Vector4<Scalar>(c1, Scalar());
-        mCol[2] = Vector4<Scalar>(c2, Scalar());
-        mCol[3] = Vector4<Scalar>(c3, Scalar(1));
+        mRow[0] = Vector4<Scalar>(c0.x, c1.x, c2.x, c3.x);
+        mRow[1] = Vector4<Scalar>(c0.y, c1.y, c2.y, c3.y);
+        mRow[2] = Vector4<Scalar>(c0.z, c1.z, c2.z, c3.z);
+        mRow[3] = Unit<3>();
     }
    
     template <typename Scalar>
     FORCEINLINE 
-    void Matrix4x4<Scalar>::setValue(const Vector4<Scalar>& c0, const Vector4<Scalar>& c1, const Vector4<Scalar>& c2, const Vector4<Scalar>& c3)
+    void Matrix4x4<Scalar>::setColumns(const Vector4<Scalar>& c0, const Vector4<Scalar>& c1, const Vector4<Scalar>& c2, const Vector4<Scalar>& c3)
     {
-        mCol[0] = c0;
-        mCol[1] = c1;
-        mCol[2] = c2;
-        mCol[3] = c3;
+        mRow[0] = Vector4<Scalar>(c0.x, c1.x, c2.x, c3.x);
+        mRow[1] = Vector4<Scalar>(c0.y, c1.y, c2.y, c3.y);
+        mRow[2] = Vector4<Scalar>(c0.z, c1.z, c2.z, c3.z);
+        mRow[3] = Vector4<Scalar>(c0.w, c1.w, c2.w, c3.w);
     }
 
-      
-    template <typename Scalar1, typename Scalar2> 
+    template <typename Scalar>
     FORCEINLINE 
-    void convert(Scalar1* v, const Matrix4x4<Scalar2>& a)
+    void Matrix4x4<Scalar>::setRows(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2, const Vector4<Scalar>& r3)
     {
-        convert(&v[0], a[0]);
-        convert(&v[4], a[1]);
-        convert(&v[8], a[2]);
-        convert(&v[12], a[3]);
+        mRow[0] = r0;
+        mRow[1] = r1;
+        mRow[2] = r2;
+        mRow[3] = r3;
     }
 
     template <typename Scalar>
@@ -235,30 +247,35 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    void Matrix4x4<Scalar>::setColumn(int i, const Vector3<Scalar>& v)
+    void Matrix4x4<Scalar>::setColumn(int j, const Vector3<Scalar>& v)
     {
-        mCol[i] = Vector4<Scalar>(v, mCol[i].w);
+        mRow[0][j] = v.x;
+        mRow[1][j] = v.y;
+        mRow[2][j] = v.z;
     }
 
     template <typename Scalar>
     FORCEINLINE 
-    void Matrix4x4<Scalar>::setColumn(int i, const Vector4<Scalar>& v)
+    void Matrix4x4<Scalar>::setColumn(int j, const Vector4<Scalar>& v)
     {
-        mCol[i] = v;
+        mRow[0][j] = v.x;
+        mRow[1][j] = v.y;
+        mRow[2][j] = v.z;
+        mRow[3][j] = v.w;
     }
 
     template <typename Scalar>
     FORCEINLINE 
     void Matrix4x4<Scalar>::setRow(int i, const Vector3<Scalar>& v)
     {
-        mCol[0][i] = v[0]; mCol[1][i] = v[1]; mCol[2][i] = v[2];
+        mRow[i] = Vector4<Scalar>(v, mRow[i].w);
     }
 
     template <typename Scalar>
     FORCEINLINE 
     void Matrix4x4<Scalar>::setRow(int i, const Vector4<Scalar>& v)
     {
-        mCol[0][i] = v[0]; mCol[1][i] = v[1]; mCol[2][i] = v[2]; mCol[3][i] = v[3];
+        mRow[i] = v;
     }
 
     template <typename Scalar> 
@@ -272,14 +289,6 @@ namespace mt
     }
 
   
-
-    template <typename Scalar>
-    FORCEINLINE 
-    Scalar tdot(const Matrix4x4<Scalar>& a, int i, const Vector4<Scalar>& v)
-    {
-        return a[0][i] * v[0] + a[1][i] * v[1] + a[2][i] * v[2] + a[3][i] * v[3];
-    }
-
     template <int I, int J, typename Scalar>
     FORCEINLINE 
     Scalar cofactor(const Matrix4x4<Scalar>& a)
@@ -291,23 +300,27 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Vector4<Scalar> row(const Matrix4x4<Scalar>& a, int i)
+    Vector4<Scalar> column(const Matrix4x4<Scalar>& a, int j)
     {
-        return Vector4<Scalar>(a[0][i], a[1][i], a[2][i], a[3][i]);
+        return Vector4<Scalar>(a[0][j], a[1][j], a[2][j], a[3][j]);
     }  
     
     template <typename Scalar>
     FORCEINLINE 
     Matrix3x3<Scalar> basis(const Matrix4x4<Scalar>& a)
     {
-        return Matrix3x3<Scalar>(xyz(a[0]), xyz(a[1]), xyz(a[2]));
+        return Matrix3x3<Scalar>(a[0][0], a[0][1], a[0][2],
+								 a[1][0], a[1][1], a[1][2],
+								 a[2][0], a[2][1], a[2][2]); 
     }
      
     template <typename Scalar>
     FORCEINLINE 
-    const Vector3<Scalar>& origin(const Matrix4x4<Scalar>& a)
+    Vector3<Scalar> origin(const Matrix4x4<Scalar>& a)
     {
-        return xyz(a[3]);
+        return Vector3<Scalar>(a[0][3], 
+                               a[1][3], 
+                               a[2][3]);
     }  
   
 
@@ -329,7 +342,6 @@ namespace mt
     std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is, Matrix4x4<Scalar>& a)
     {
         is >> a[0] >> a[1] >> a[2] >> a[3];
-        a = transpose(a);
         return is;
     }
 
@@ -338,7 +350,7 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Vector4<Scalar> mul(const Vector4<Scalar>& v, const Matrix4x4<Scalar>& a)
+    Vector4<Scalar> mul(const Matrix4x4<Scalar>& a, const Vector4<Scalar>& v)
     {
         return Vector4<Scalar>(dot(v, a[0]), 
                                dot(v, a[1]), 
@@ -348,19 +360,19 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Vector4<Scalar> mul(const Matrix4x4<Scalar>& a, const Vector4<Scalar>& v)
+    Vector4<Scalar> mul(const Vector4<Scalar>& v, const Matrix4x4<Scalar>& a)
     {
-        return Vector4<Scalar>(tdot(a, 0, v), 
-                               tdot(a, 1, v), 
-                               tdot(a, 2, v), 
-                               tdot(a, 3, v));
+        return v.x * a[0] + v.y * a[1] + v.z * a[2] + v.w * a[3];
     }
 
     template <typename Scalar>
     FORCEINLINE 
     Matrix4x4<Scalar> mul(const Matrix4x4<Scalar>& a, const Matrix4x4<Scalar>& b)
     {
-        return Matrix4x4<Scalar>(mul(a, b[0]), mul(a, b[1]), mul(a, b[2]), mul(a, b[3]));
+        return Matrix4x4<Scalar>(mul(a[0], b),
+                                 mul(a[1], b), 
+                                 mul(a[2], b), 
+                                 mul(a[3], b));
     }
 
 
@@ -514,6 +526,16 @@ namespace mt
         Matrix3x3<Scalar> invBasis = transpose(basis(a));
 
         return Matrix4x4<Scalar>(invBasis, mul(invBasis, -origin(a)));
+    }
+
+    template <typename Scalar1, typename Scalar2> 
+    FORCEINLINE 
+    void convert(Scalar1* v, const Matrix4x4<Scalar2>& a)
+    {
+		v[0] = Scalar1(a[0][0]); v[4] = Scalar1(a[0][1]); v[8] = Scalar1(a[0][2]); v[12] = Scalar1(a[0][3]); 
+        v[1] = Scalar1(a[1][0]); v[5] = Scalar1(a[1][1]); v[9] = Scalar1(a[1][2]); v[13] = Scalar1(a[1][3]); 
+        v[2] = Scalar1(a[2][0]); v[6] = Scalar1(a[2][1]); v[10] = Scalar1(a[2][2]); v[14] = Scalar1(a[2][3]);  
+        v[3] = Scalar1(a[3][0]); v[7] = Scalar1(a[3][1]); v[11] = Scalar1(a[3][2]); v[15] = Scalar1(a[3][3]);
     }
 }
 

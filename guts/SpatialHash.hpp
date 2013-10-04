@@ -84,7 +84,7 @@ namespace guts
                 pos[i] = v[i] + ((bits & (1 << i)) ? -range : range);  
             }
             
-            size_t bucket = mHashFunc(pos) % this->mNbuckets;
+            size_t bucket = this->mHashFunc(pos) % this->mNbuckets;
 
             int k = 0;
             while (k != bucketCount && buckets[k] != bucket)

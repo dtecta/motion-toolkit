@@ -29,10 +29,11 @@ namespace mt
         Matrix4x4(Identity);
         template<typename Scalar2> explicit Matrix4x4(const Scalar2* v);   
         Matrix4x4(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3);
-        Matrix4x4(const Vector4<float>& c0, const Vector4<float>& c1, const Vector4<float>& c2, const Vector4<float>& c3);
-        Matrix4x4(const __m128& c0, const __m128& c1, const __m128& c2, const __m128& c3);
+        Matrix4x4(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2, const Vector4<float>& r3);
+        Matrix4x4(const __m128& r0, const __m128& r1, const __m128& r2, const __m128& r3);
         explicit Matrix4x4(const Vector3<float>& p);
         explicit Matrix4x4(const Matrix3x3<float>& a, const Vector3<float>& p = Zero());
+        explicit Matrix4x4(const Matrix3x4<float>& a);
         
         operator const Vector4<float>*() const; 
         operator Vector4<float>*();
@@ -40,21 +41,22 @@ namespace mt
         Matrix4x4<float>& operator=(Identity);
   
         template <typename Scalar2> void setValue(const Scalar2* v);  
-        void setValue(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3);
-        void setValue(const Vector4<float>& c0, const Vector4<float>& c1, const Vector4<float>& c2, const Vector4<float>& c3);
+        void setColumns(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3);
+        void setColumns(const Vector4<float>& c0, const Vector4<float>& c1, const Vector4<float>& c2, const Vector4<float>& c3);
+        void setRows(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2, const Vector4<float>& r3);
         void setValue(const __m128& c0, const __m128& c1, const __m128& c2, const __m128& c3);
       
         void setBasis(const Matrix3x3<float>& basis);
         void setOrigin(const Vector3<float>& origin);
 
-        void setColumn(int i, const Vector3<float>& v);
-        void setColumn(int i, const Vector4<float>& v);
+        void setColumn(int j, const Vector3<float>& v);
+        void setColumn(int j, const Vector4<float>& v);
 
         void setRow(int i, const Vector3<float>& v);
         void setRow(int i, const Vector4<float>& v);
 
     private:
-        Vector4<float> mCol[4];
+        Vector4<float> mRow[4];
     };
 
     Vector4<float> mul(const Matrix4x4<float>& a, const Vector4<float>& v);
@@ -87,61 +89,70 @@ namespace mt
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3)
     {
-        setValue(c0, c1, c2, c3);
+        setColumns(c0, c1, c2, c3);
     }
    
 
-    
     FORCEINLINE 
-    Matrix4x4<float>::Matrix4x4(const Vector4<float>& c0, const Vector4<float>& c1, const Vector4<float>& c2, const Vector4<float>& c3)
+    Matrix4x4<float>::Matrix4x4(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2, const Vector4<float>& r3)
     {
-        setValue(c0, c1, c2, c3);
+        setRows(r0, r1, r2, r3);
     }
+
     FORCEINLINE 
-    Matrix4x4<float>::Matrix4x4(const __m128& c0, const __m128& c1, const __m128& c2, const __m128& c3)
+    Matrix4x4<float>::Matrix4x4(const __m128& r0, const __m128& r1, const __m128& r2, const __m128& r3)
     {
-        setValue(c0, c1, c2, c3);
+        setValue(r0, r1, r2, r3);
     }
 
     
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Vector3<float>& p)
     {
-        mCol[0] = Unit<0>();
-        mCol[1] = Unit<1>();
-        mCol[2] = Unit<2>();
-        mCol[3] = Vector4<float>(p, float(1));
+        mRow[0] = Vector4<float>(Vector3<float>(Unit<0>()), p.x);
+        mRow[1] = Vector4<float>(Vector3<float>(Unit<1>()), p.y);
+        mRow[2] = Vector4<float>(Vector3<float>(Unit<2>()), p.z);
+        mRow[3] = Unit<3>();
     }
 
     
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Matrix3x3<float>& a, const Vector3<float>& p)
     {
-        mCol[0] = Vector4<float>(a[0][0], a[1][0], a[2][0], float());
-        mCol[1] = Vector4<float>(a[0][1], a[1][1], a[2][1], float());
-        mCol[2] = Vector4<float>(a[0][2], a[1][2], a[2][2], float());
-        mCol[3] = Vector4<float>(p, float(1));
+        mRow[0] = Vector4<float>(a[0], p.x);
+        mRow[1] = Vector4<float>(a[1], p.y);
+        mRow[2] = Vector4<float>(a[2], p.z);
+        mRow[3] = Unit<3>();
+    }
+        
+    FORCEINLINE 
+    Matrix4x4<float>::Matrix4x4(const Matrix3x4<float>& a)
+    {
+        mRow[0] = a[0];
+        mRow[1] = a[1];
+        mRow[2] = a[2];
+        mRow[3] = Unit<3>();
     }
         
     FORCEINLINE
     Matrix4x4<float>::operator const Vector4<float>*() const
     {
-        return mCol;
+        return mRow;
     } 
 
     FORCEINLINE
     Matrix4x4<float>::operator Vector4<float>*()
     {
-        return mCol;
+        return mRow;
     } 
     
     FORCEINLINE 
     Matrix4x4<float>& Matrix4x4<float>::operator=(Identity)
     {
-        mCol[0] = Unit<0>();
-        mCol[1] = Unit<1>();
-        mCol[2] = Unit<2>();
-        mCol[3] = Unit<3>();
+        mRow[0] = Unit<0>();
+        mRow[1] = Unit<1>();
+        mRow[2] = Unit<2>();
+        mRow[3] = Unit<3>();
         return *this;
     }
 
@@ -149,43 +160,48 @@ namespace mt
     FORCEINLINE
     void Matrix4x4<float>::setValue(const Scalar2* v)
     {
-        mCol[0] = Vector4<float>(&v[0]); 
-        mCol[1] = Vector4<float>(&v[4]); 
-        mCol[2] = Vector4<float>(&v[8]); 
-        mCol[3] = Vector4<float>(&v[12]); 
+        mRow[0] = Vector4<float>(float(v[0]), float(v[4]), float(v[8]), float(v[12])); 
+		mRow[1] = Vector4<float>(float(v[1]), float(v[5]), float(v[9]), float(v[13])); 
+        mRow[2] = Vector4<float>(float(v[2]), float(v[6]), float(v[10]), float(v[14])); 
+        mRow[3] = Vector4<float>(float(v[3]), float(v[7]), float(v[11]), float(v[15])); 
     }  
 
-   
-
-
-
     
     FORCEINLINE 
-    void Matrix4x4<float>::setValue(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3)
+    void Matrix4x4<float>::setColumns(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3)
     {
-        mCol[0] = Vector4<float>(c0, float());
-        mCol[1] = Vector4<float>(c1, float());
-        mCol[2] = Vector4<float>(c2, float());
-        mCol[3] = Vector4<float>(c3, float(1));
+        mRow[0] = Vector4<float>(c0.x, c1.x, c2.x, c3.x);
+        mRow[1] = Vector4<float>(c0.y, c1.y, c2.y, c3.y);
+        mRow[2] = Vector4<float>(c0.z, c1.z, c2.z, c3.z);
+        mRow[3] = Unit<3>();
     }
    
     
     FORCEINLINE 
-    void Matrix4x4<float>::setValue(const Vector4<float>& c0, const Vector4<float>& c1, const Vector4<float>& c2, const Vector4<float>& c3)
+    void Matrix4x4<float>::setColumns(const Vector4<float>& c0, const Vector4<float>& c1, const Vector4<float>& c2, const Vector4<float>& c3)
     {
-        mCol[0] = c0;
-        mCol[1] = c1;
-        mCol[2] = c2;
-        mCol[3] = c3;
+        mRow[0] = Vector4<float>(c0.x, c1.x, c2.x, c3.x);
+        mRow[1] = Vector4<float>(c0.y, c1.y, c2.y, c3.y);
+        mRow[2] = Vector4<float>(c0.z, c1.z, c2.z, c3.z);
+        mRow[3] = Vector4<float>(c0.w, c1.w, c2.w, c3.w);
     }
 
     FORCEINLINE 
-    void Matrix4x4<float>::setValue(const __m128& c0, const __m128& c1, const __m128& c2, const __m128& c3)
+    void Matrix4x4<float>::setRows(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2, const Vector4<float>& r3)
     {
-        mCol[0] = c0;
-        mCol[1] = c1;
-        mCol[2] = c2;
-        mCol[3] = c3;
+        mRow[0] = r0;
+        mRow[1] = r1;
+        mRow[2] = r2;
+        mRow[3] = r3;
+    }
+
+    FORCEINLINE 
+    void Matrix4x4<float>::setValue(const __m128& r0, const __m128& r1, const __m128& r2, const __m128& r3)
+    {
+        mRow[0] = r0;
+        mRow[1] = r1;
+        mRow[2] = r2;
+        mRow[3] = r3;
     }
         
     FORCEINLINE 
@@ -205,30 +221,35 @@ namespace mt
 
     
     FORCEINLINE 
-    void Matrix4x4<float>::setColumn(int i, const Vector3<float>& v)
+    void Matrix4x4<float>::setColumn(int j, const Vector3<float>& v)
     {
-        mCol[i] = Vector4<float>(v, mCol[i].w);
+        mRow[0][j] = v.x;
+        mRow[1][j] = v.y;
+        mRow[2][j] = v.z;
     }
 
     
     FORCEINLINE 
-    void Matrix4x4<float>::setColumn(int i, const Vector4<float>& v)
+    void Matrix4x4<float>::setColumn(int j, const Vector4<float>& v)
     {
-        mCol[i] = v;
+        mRow[0][j] = v.x;
+        mRow[1][j] = v.y;
+        mRow[2][j] = v.z;
+        mRow[3][j] = v.w;
     }
 
     
     FORCEINLINE 
     void Matrix4x4<float>::setRow(int i, const Vector3<float>& v)
     {
-        mCol[0][i] = v[0]; mCol[1][i] = v[1]; mCol[2][i] = v[2];
+        mRow[i] = Vector4<float>(v, mRow[i].w);
     }
 
     
     FORCEINLINE 
     void Matrix4x4<float>::setRow(int i, const Vector4<float>& v)
     {
-        mCol[0][i] = v[0]; mCol[1][i] = v[1]; mCol[2][i] = v[2]; mCol[3][i] = v[3];
+        mRow[i] = v;
     }
 
           
@@ -236,12 +257,12 @@ namespace mt
 
     
     FORCEINLINE 
-    Vector4<float> mul(const Vector4<float>& v, const Matrix4x4<float>& a)
+    Vector4<float> mul(const Matrix4x4<float>& a, const Vector4<float>& v)
     {
-        __m128 tmp0 = _mm_mul_ps(v.vec, a[0].vec);
-        __m128 tmp1 = _mm_mul_ps(v.vec, a[1].vec);
-        __m128 tmp2 = _mm_mul_ps(v.vec, a[2].vec);
-        __m128 tmp3 = _mm_mul_ps(v.vec, a[3].vec);
+        __m128 tmp0 = _mm_mul_ps(a[0].vec, v.vec);
+        __m128 tmp1 = _mm_mul_ps(a[1].vec, v.vec);
+        __m128 tmp2 = _mm_mul_ps(a[2].vec, v.vec);
+        __m128 tmp3 = _mm_mul_ps(a[3].vec, v.vec);
 
         transpose(tmp0, tmp1, tmp2, tmp3);
 
@@ -250,12 +271,12 @@ namespace mt
 
     
     FORCEINLINE 
-    Vector4<float> mul(const Matrix4x4<float>& a, const Vector4<float>& v)
+    Vector4<float> mul(const Vector4<float>& v, const Matrix4x4<float>& a)
     {
-        __m128 result = _mm_mul_ps(a[0].vec, MT_SPLAT(v.vec, 0));
-        result = _mm_add_ps(result, _mm_mul_ps(a[1].vec, MT_SPLAT(v.vec, 1)));
-        result = _mm_add_ps(result, _mm_mul_ps(a[2].vec, MT_SPLAT(v.vec, 2)));
-        result = _mm_add_ps(result, _mm_mul_ps(a[3].vec, MT_SPLAT(v.vec, 3)));
+        __m128 result = _mm_mul_ps(MT_SPLAT(v.vec, 0), a[0].vec);
+        result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 1), a[1].vec));
+		result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 2), a[2].vec));
+		result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 3), a[3].vec));
 
         return Vector4<float>(result);
     }

@@ -82,7 +82,7 @@ namespace mt
         typedef float ScalarType; 
       
         Vector4(); 
-        Vector4(float x, float y, float z, float w = float());   
+        Vector4(float x, float y, float z, float w);   
         explicit Vector4(__m128 v); 
         explicit Vector4(const float* v);  
 
@@ -91,7 +91,8 @@ namespace mt
         template <int I> Vector4(Unit<I>); 
         template <typename Scalar2> explicit Vector4(const Scalar2* v);  
         template <typename Scalar2> Vector4(const Vector4<Scalar2>& a);  
-        template <typename Scalar2> Vector4(const Vector3<Scalar2>& a, float w = float());   
+        template <typename Scalar2> explicit Vector4(const Vector3<Scalar2>& a, float w = float());   
+        explicit Vector4(float w);
 
         operator const float*() const;
         operator float*();
@@ -214,6 +215,11 @@ namespace mt
     FORCEINLINE 
     Vector4<float>::Vector4(const Vector3<Scalar2>& a, float w)
         : vec(_mm_setr_ps(float(a.x), float(a.y), float(a.z), w))
+    {}
+   
+    FORCEINLINE
+    Vector4<float>::Vector4(float w)
+        : vec(_mm_setr_ps(float(), float(), float(), w))
     {}
 
     FORCEINLINE
