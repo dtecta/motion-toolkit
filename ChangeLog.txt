@@ -1,3 +1,11 @@
+2013-10-4: Fixed guts::RefPtr reference count for copy constructor 
+		   Fixed guts::Vector for Visual C++ 11.0
+           Added isfinite predicate for vector types
+		   Added logUnit and exp for unit dual quaternions
+		   Matrix4x4 is now row-major. All matrix types are now row major. 
+		   Added Matrix3x4 for affine transformations.
+		   
+
 2013-03-23: Imported the motion toolkit into a Google code repository.
 
 2012-03-20: version 0.2.1
