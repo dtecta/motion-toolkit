@@ -19,20 +19,23 @@
 #include <limits>
 #include <new>
 #include <algorithm>
-#include <guts/Vector.hpp>
+#include <functional>
 
 #include <consolid/consolid.h>
+#include <guts/Vector.hpp>
 
 #include "Invariant.hpp"
 
 
 namespace guts
 {
-    template <typename Key, typename Index, typename Alloc = std::allocator<std::pair<Key, Index*> > >
+    template <typename Key, typename Index, typename Compare = std::less<Key>, typename Alloc = std::allocator<std::pair<Key, Index*> > >
     class PriorityQueue
+        : public Compare
     {       
     public:
-        PriorityQueue()
+        PriorityQueue(const Compare& comp = Compare())
+            : Compare(comp)
         {}
 
         bool empty() const
@@ -50,7 +53,7 @@ namespace guts
         void decrease_key(Index hole, Key key)
         {
             Entry* base = &mHeap.front();
-            ASSERT(!(base[hole].first < key));
+            ASSERT(!(*this)(base[hole].first, key));
 
             adjust_up(base, hole, key, base[hole].second);
         }
@@ -93,10 +96,10 @@ namespace guts
 
        
 
-        static void adjust_up(Entry* base, Index hole, Key key, Index* index)
+        void adjust_up(Entry* base, Index hole, Key key, Index* index)
         {
             Index parent; 
-            while (hole != 0 && key < base[parent = (hole - 1) >> 1].first)
+            while (hole != 0 && (*this)(key, base[parent = (hole - 1) >> 1].first))
             {
                 base[hole] = base[parent];
                 *base[hole].second = Index(hole);
@@ -113,8 +116,8 @@ namespace guts
             Index child = 2;
             while (child < last)
             {  
-                child -= Index(base[child - 1].first < base[child].first);
-                if (!(base[child].first < base[last].first))
+                child -= Index((*this)(base[child - 1].first, base[child].first));
+                if (!(*this)(base[child].first, base[last].first))
                 {
                     return hole;
                 }
@@ -124,7 +127,7 @@ namespace guts
                 child = (hole << 1) + 2;
             } 
             --child;
-            if (child < last && (base[child].first < base[last].first))
+            if (child < last && (*this)(base[child].first, base[last].first))
             { 
                 base[hole] = base[child];
                 *base[hole].second = Index(hole);
@@ -134,7 +137,7 @@ namespace guts
             return hole;
         } 
 
-        Heap mHeap;        
+        Heap mHeap;    
         
         INVARIANT
         {
@@ -149,8 +152,7 @@ namespace guts
                 for (Index i = 1; i != size; ++i)
                 {
                     Index parent = (i - 1) >> 1;
-                    ASSERT(!(base[i].first < base[parent].first)); // Binary heap condition. Contrary to the STL 
-                                                                   // priority_queue, top is the smallest key.                       
+                    ASSERT(!(*this)(base[i].first, base[parent].first)); // Binary heap condition. Contrary to the STL priority_queue, top is the smallest key.                       
                     ASSERT(*base[i].second == i);
                 }
             }

@@ -27,6 +27,8 @@
 
 #endif
 
+#include <guts/Singleton.hpp>
+
 
 
 namespace guts
@@ -65,14 +67,15 @@ namespace guts
 #endif  
 
     class MemAlloc
+        : public guts::Singleton<MemAlloc>
     {
     public:
-        static MemAlloc& instance()
-        { 
-            static MemAlloc theMemAlloc;
-            return theMemAlloc;
-        }
-    
+        MemAlloc()
+            : mAlloc(&defaultAlloc)
+            , mFree(&defaultFree)
+            , mClientData(0)
+        {}
+
         void setMemAllocCallbacks(AllocCallback alloc, FreeCallback free, void* clientData)
         {
             mAlloc = alloc;
@@ -102,12 +105,6 @@ namespace guts
         }
 
     private: 
-        MemAlloc()
-            : mAlloc(&defaultAlloc)
-            , mFree(&defaultFree)
-            , mClientData(0)
-        {}
-         
         MemAlloc(const MemAlloc&);
         MemAlloc& operator=(const MemAlloc&);
 

@@ -39,18 +39,26 @@ namespace mt
 
 
     template <typename Scalar> std::complex<Scalar> euler(Scalar theta);
-    template <typename Scalar> Vector4<Scalar> axisAngle(const Vector3<Scalar>& u, Scalar theta);
+
+    template <typename Scalar> Vector4<Scalar> fromAxisAngle(const Vector3<Scalar>& axis, Scalar theta);
+    template <typename Scalar> void toAxisAngle(Vector3<Scalar>& axis, Scalar& theta, const Vector4<Scalar>& u);
+
     template <typename Scalar> Vector4<Scalar> exp(const Vector3<Scalar>& v);
+    template <typename Scalar> Vector3<Scalar> logUnit(const Vector4<Scalar>& u);
+	
+	template <typename Scalar1, typename Scalar2> 
+    Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t);
+      
+
     template <typename Scalar> Vector4<Scalar> exp(const Vector4<Scalar>& q); 
     template <typename Scalar> Vector4<Scalar> log(const Vector4<Scalar>& q); 
-    template <typename Scalar> Vector3<Scalar> logUnit(const Vector4<Scalar>& u);
     
     template <typename Scalar1, typename Scalar2> 
     Vector4<Scalar1> logLerp(const Vector4<Scalar1>& q1, const Vector4<Scalar1>& q2, Scalar2 t);
 
-    template <typename Scalar1, typename Scalar2> 
-    Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t);
-      
+    template <typename Scalar1, typename Scalar2> Vector4<Scalar1> integrate(const Vector4<Scalar1>& q0, const Vector3<Scalar1>& v, Scalar2 h);
+    template <typename Scalar1, typename Scalar2> Vector3<Scalar1> velocity(const Vector4<Scalar1>& q0, const Vector4<Scalar1>& q1, Scalar2 h);
+
     template <typename Scalar>
     Vector3<Scalar> dihedral(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2);
 
@@ -157,13 +165,21 @@ namespace mt
     
     template <typename Scalar>
     FORCEINLINE
-    Vector4<Scalar> axisAngle(const Vector3<Scalar>& u, Scalar theta)
+    Vector4<Scalar> fromAxisAngle(const Vector3<Scalar>& axis, Scalar theta)
     {
         std::complex<Scalar> c = euler(theta * Scalar(0.5));
-        Scalar r = lengthSquared(u);
+        Scalar r = lengthSquared(axis);
         ASSERT(ispositive(r));
         Scalar s = c.imag() * rsqrt(r);
-        return Vector4<Scalar>(u * s, c.real());
+        return Vector4<Scalar>(axis * s, c.real());
+    }
+
+	template <typename Scalar>
+    FORCEINLINE
+    void toAxisAngle(Vector3<Scalar>& axis, Scalar& theta, const Vector4<Scalar>& u)
+    {
+        theta = acos(u.w) * Scalar(2);
+        axis = normalize(xyz(u));
     }
     
     template <typename Scalar>
@@ -181,9 +197,23 @@ namespace mt
             return Identity();
         }
     }
-
-
+   
     template <typename Scalar>
+    Vector3<Scalar> logUnit(const Vector4<Scalar>& u)
+    {
+        Scalar theta = acos(u.w);
+        ASSERT(isfinite(theta));
+        return normalize(xyz(u)) * theta;
+    }
+
+	template <typename Scalar1, typename Scalar2>
+    Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t)
+    {
+        return exp(lerp(logUnit(u1), logUnit(u2), t));  
+    } 
+    
+
+	template <typename Scalar>
     Vector4<Scalar> exp(const Vector4<Scalar>& q)
     {
         const Vector3<Scalar>& v = xyz(q); 
@@ -199,14 +229,6 @@ namespace mt
         {
             return Vector4<Scalar>(Scalar(), Scalar(), Scalar(), rho);
         }
-    }
-
-    template <typename Scalar>
-    Vector3<Scalar> logUnit(const Vector4<Scalar>& u)
-    {
-        Scalar theta = acos(u.w);
-        ASSERT(isfinite(theta));
-        return normalize(xyz(u)) * theta;
     }
 
     template <typename Scalar>
@@ -226,11 +248,20 @@ namespace mt
     }  
 
     template <typename Scalar1, typename Scalar2>
-    Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t)
+    FORCEINLINE 
+    Vector4<Scalar1> integrate(const Vector4<Scalar1>& q0, const Vector3<Scalar1>& v, Scalar2 h)
     {
-        return exp(lerp(logUnit(u1), logUnit(u2), t));  
-    } 
-    
+        return normalize(q0 + mul(v * (h * Scalar2(0.5)) , q0));
+    }
+
+    template <typename Scalar1, typename Scalar2>
+    FORCEINLINE 
+    Vector3<Scalar1> velocity(const Vector4<Scalar1>& q0, const Vector4<Scalar1>& q1, Scalar2 h)
+    {
+        return xyz(mul(q1 - q0, conjugate(q0))) * (Scalar2(2) / h);
+    }
+
+  
     template <typename Scalar>
     Vector3<Scalar> dihedral(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2)
     {
@@ -241,26 +272,6 @@ namespace mt
         ASSERT(isfinite(theta));
         return normalize(cross(u1, u2)) * theta; 
     }
-    
-    template <typename Scalar>
-    FORCEINLINE
-    Vector4<Scalar> fromSpherical(Scalar rho, Scalar phi, Scalar theta)
-    {
-        std::complex<Scalar> c1 = euler(theta);
-        std::complex<Scalar> c2 = euler(phi);
-        Vector3<Scalar> axis(c1.real() * c2.imag(), c1.imag() * c2.imag(), c2.real());
-        return axisAngle(axis, rho);  
-    }
-
-    template <typename Scalar>
-    FORCEINLINE
-    void toSpherical(Scalar& rho, Scalar& phi, Scalar& theta, const Vector4<Scalar>& u)
-    {
-        rho = acos(u.w) * Scalar(2);
-        Vector3<Scalar> axis = normalize(xyz(u));
-        phi = acos(axis.z);
-        theta = atan2(axis.y, axis.x);  
-    }
 
     template <typename Scalar>
     FORCEINLINE
@@ -269,7 +280,7 @@ namespace mt
         std::complex<Scalar> c1 = euler(theta);
         std::complex<Scalar> c2 = euler(phi);
         Vector3<Scalar> axis(c1.real() * c2.imag(), c1.imag() * c2.imag(), c2.real());
-        return axisAngle(axis, rho);  
+        return fromAxisAngle(axis, rho);  
     }
 
 }

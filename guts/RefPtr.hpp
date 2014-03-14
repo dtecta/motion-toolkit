@@ -17,54 +17,41 @@
 
 #include "Memory.hpp"
 
-#ifdef GUTS_USE_ATOMIC_REF_COUNT
-#include <tbb/atomic.h>
-#endif
-
 namespace guts
 {
     class RefCounted
     {
     public:
         RefCounted() 
-        {
-            mRefCount = 0;
-        }
+            : mRefCount(0)
+        {}
 
-        RefCounted(const RefCounted&) 
-        {
-            mRefCount = 0;
-        }
+        RefCounted(const RefCounted&)
+            : mRefCount(0) 
+        {}      
+
+        long refCount() const { return mRefCount; }
 
         void increase()
         { 
-            ++mRefCount; 
+            INTERLOCKED_INCREMENT(&mRefCount); 
         }
 
         void decrease()
         {
             ASSERT(mRefCount != 0);
-            if (--mRefCount == 0)
+            if (INTERLOCKED_DECREMENT(&mRefCount) == 0)
             {
                 this->~RefCounted();
                 DEALLOCATE(this);
             }
         }
-
-        uint32_t refCount() const { return mRefCount; }
-
+  
     protected:
          virtual ~RefCounted() {}
 
     private:
-
-#ifdef GUTS_USE_ATOMIC_REF_COUNT
-        typedef tbb::atomic<uint32_t> NumberType;
-#else
-        typedef uint32_t NumberType;  
-#endif 
-
-        NumberType mRefCount;
+        volatile long mRefCount;
     };
 
     template <typename T>

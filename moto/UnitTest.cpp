@@ -328,7 +328,7 @@ int main()
     Scalar theta = 1;
     for (int k = 0; k != 12; ++k)
     {
-        DualQuaternion dqt = rigid(axisAngle(Vector3(0, 1, 0), theta), Vector3(0, 0, 1));
+        DualQuaternion dqt = rigid(fromAxisAngle(Vector3(0, 1, 0), theta), Vector3(0, 0, 1));
         DualVector3 logdqt = logUnit(dqt); 
         DualQuaternion dqt2 = exp(logdqt);
 

@@ -20,7 +20,7 @@
 #ifndef NDEBUG
 #include "MemAllocLog.hpp"
 
-#define REPORT_LEAKS() guts::MemAllocLog::instance().reportLeaks()
+#define REPORT_LEAKS() guts::MemAllocLog::instance().logLeaks()
 #define ALLOCATE(T) static_cast<T*>(guts::MemAllocLog::instance().alloc(sizeof(T), __FILE__, __LINE__))
 #define ALLOCATE_ARRAY(T, n) static_cast<T*>(guts::MemAllocLog::instance().alloc((n) * sizeof(T), __FILE__, __LINE__))
 #define DEALLOCATE(p) guts::MemAllocLog::instance().free(p)

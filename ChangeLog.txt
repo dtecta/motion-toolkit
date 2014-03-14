@@ -1,20 +1,24 @@
-2013-10-4: Fixed guts::RefPtr reference count for copy constructor 
-		   Fixed guts::Vector for Visual C++ 11.0
-           Added isfinite predicate for vector types
-		   Added logUnit and exp for unit dual quaternions
-		   Matrix4x4 is now row-major. All matrix types are now row major. 
-		   Added Matrix3x4 for affine transformations.
-		   
+2014-3-14: version 0.2.4
+Added wrappers for atomic intrinsics in order to remove the dependency on TBB.
+Added a thread-safe lock-free singleton base class.
+STATIC_ASSERT now can be used outside class templates.
+Changed "axisAggle" to "fromAxisAngle".
 
-2013-03-23: Imported the motion toolkit into a Google code repository.
+2013-10-4: version 0.2.3
+Fixed guts::RefPtr reference count for copy constructor 
+Fixed guts::Vector for Visual C++ 11.0
+Added isfinite predicate for vector types
+Added logUnit and exp for unit dual quaternions
+Matrix4x4 is now row-major. All matrix types are now row major. 
+Added Matrix3x4 for affine transformations.
+		   
+2013-03-23: version 0.2.2
+Imported the motion toolkit into a Google code repository.
 
 2012-03-20: version 0.2.1
-	Added an example on how to use dual numbers for computing
-	second-order derivatives, as a follow up on a question asked 
-	at my GDC 2012 dual numbers talk.
-
+Added an example on how to use dual numbers for computing second-order derivatives,
+as a follow up on a question asked at my GDC 2012 dual numbers talk.
 
 2012-03-06:	version 0.2
-	GDC 2012 release accompanying my talk "Math for Game Programmmers
-	Tutorial: Dual Numbers" 
+GDC 2012 release accompanying my talk "Math for Game Programmmers Tutorial: Dual Numbers" 
 	

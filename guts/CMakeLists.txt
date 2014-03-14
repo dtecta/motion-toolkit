@@ -15,6 +15,7 @@ add_executable(guts
   RefPtr.hpp
   RuntimeError.hpp
   Set.hpp
+  Singleton.hpp
   SharedPtr.hpp
   SpatialHash.hpp
   SStream.hpp

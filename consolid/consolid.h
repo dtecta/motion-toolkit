@@ -12,8 +12,8 @@
  * purpose.  It is provided "as is" without express or implied warranty.
  */
 
-#ifndef _CONSOLID_H
-#define _CONSOLID_H
+#ifndef CONSOLID_CONSOLID_H
+#define CONSOLID_CONSOLID_H
 
 #include <assert.h>
 #include <stddef.h>
@@ -107,5 +107,28 @@ int snprintf(char* str, size_t size, const char* format, ...);
 #   define ROUND_DOWN() 
 #   define ROUND_UP()
 #endif 
+
+#if (_MSC_VER >= 1400)
+#   include <intrin.h>
+#   pragma intrinsic (_InterlockedIncrement)
+#   pragma intrinsic (_InterlockedDecrement)
+#   pragma intrinsic (_InterlockedCompareExchange)
+#   define INTERLOCKED_INCREMENT(ptr) _InterlockedIncrement(ptr)
+#   define INTERLOCKED_DECREMENT(ptr) _InterlockedDecrement(ptr)
+#   define INTERLOCKED_COMPARE_EXCHANGE(ptr, newval, oldval) _InterlockedCompareExchange(ptr, newval, oldval)
+#   if defined(_M_X64)
+#       pragma intrinsic (_InterlockedCompareExchangePointer)
+#       define INTERLOCKED_COMPARE_EXCHANGE_POINTER(ptr, newval, oldval) _InterlockedCompareExchangePointer((void* volatile*)(ptr), newval, oldval)
+#   else
+#       define INTERLOCKED_COMPARE_EXCHANGE_POINTER(ptr, newval, oldval) ((void*)_InterlockedCompareExchange((long volatile*)(ptr), (long)(newval), (long)(oldval)))
+#   endif
+#elif defined(__GNUC__)
+#   define INTERLOCKED_INCREMENT(ptr) __sync_add_and_fetch((ptr), 1)
+#   define INTERLOCKED_DECREMENT(ptr) __sync_sub_and_fetch((ptr), 1)
+#   define INTERLOCKED_COMPARE_EXCHANGE(ptr, newval, oldval) __sync_val_compare_and_swap(ptr, oldval, newval)
+#   define INTERLOCKED_COMPARE_EXCHANGE_POINTER(ptr, newval, oldval) __sync_val_compare_and_swap(ptr, oldval, newval)
+#else
+#   error "Platform does not support atomic primitives"
+#endif
 
 #endif

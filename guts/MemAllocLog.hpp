@@ -8,14 +8,9 @@
 namespace guts
 {
     class MemAllocLog
+        : public guts::Singleton<MemAllocLog>
     {
     public:
-        static MemAllocLog& instance() 
-        { 
-            static MemAllocLog theMemoryLogger; 
-            return theMemoryLogger; 
-        }
-
         void* alloc(size_t n, const char* file, unsigned line) 
         {  
             Allocation* link = static_cast<Allocation*>(MemAlloc::instance().alloc(sizeof(Allocation) + n));
@@ -36,47 +31,47 @@ namespace guts
             }
         }
 
-        void reportLeaks() const
+		template <typename ReportLeakFunc>
+        void reportLeaks(ReportLeakFunc& func) const
         {
             for (Link* it = mList.begin(); it != mList.end(); it = it->next())
             {
                 Allocation* link = static_cast<Allocation*>(it);
+				func(link->file(), link->line());
+            }
+        }
 
-                Log::instance().notify(Log::WARNING, "Memory allocated in source %s line %d leaked.\n", link->file(), link->line());
+		void logLeaks() const
+        {
+            for (Link* it = mList.begin(); it != mList.end(); it = it->next())
+            {
+                Allocation* link = static_cast<Allocation*>(it);
+				Log::instance().notify(Log::WARNING, "Memory allocated in source %s line %d leaked.\n", link->file(), link->line());
             }
         }
 
     private:
-        MemAllocLog() {}
-        ~MemAllocLog() {}
-      
-
         class Allocation
             : public Link        
         {
         public:
             Allocation(const char* file, unsigned line)
                 : mFile(file)
-                , mLine(line)
-                , mMark(CHECK_MARK)
+                , mLine((line & 0xffff) | CHECK_MARK)
             {} 
  
             const char* file() const { return mFile; }
-            unsigned line() const { return mLine; }
+            unsigned line() const { return mLine & 0xffff; }
 
-            bool isOK() const { return mMark == CHECK_MARK; } 
+            bool isOK() const { return (mLine & 0xffff0000) == CHECK_MARK; } 
 
         private:
-            enum { CHECK_MARK = 0xA11C };
+            enum { CHECK_MARK = 0xA11C0000 };
 
             const char* mFile;
             union 
             {
-                struct 
-                {
-                    unsigned mLine : 16;
-                    unsigned mMark : 16;
-                };
+                uint32_t mLine;
                 char mPadding[sizeof(void*)];  
             };
         };

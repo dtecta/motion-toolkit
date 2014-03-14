@@ -64,9 +64,11 @@ namespace mt
 
     template <typename Scalar> Interval<Scalar> operator+(const Interval<Scalar>& z, Scalar x);
     template <typename Scalar> Interval<Scalar> operator-(const Interval<Scalar>& z, Scalar x);
+    template <typename Scalar> Interval<Scalar> operator*(const Interval<Scalar>& z, Scalar x);
 
     template <typename Scalar> Interval<Scalar> operator+(Scalar x, const Interval<Scalar>& z);
     template <typename Scalar> Interval<Scalar> operator-(Scalar x, const Interval<Scalar>& z);
+    template <typename Scalar> Interval<Scalar> operator*(Scalar x, const Interval<Scalar>& z);
 
     template <typename Scalar1, typename Scalar2>
     Interval<typename Promote<Scalar1, Scalar2>::RT> operator+(const Interval<Scalar1>& z1, const Interval<Scalar2>& z2);
@@ -260,6 +262,13 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
+    Interval<Scalar> operator*(const Interval<Scalar>& z, Scalar x)
+    {
+        return Interval<Scalar>(z.lower() * x, z.upper() * x);
+    }
+
+    template <typename Scalar>
+    FORCEINLINE 
     Interval<Scalar> operator+(Scalar x, const Interval<Scalar>& z)
     {
         return z + x;
@@ -271,11 +280,18 @@ namespace mt
     {
          return Interval<Scalar>(x - z.upper(), x - z.lower());
     }
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Interval<Scalar> operator*(Scalar x, const Interval<Scalar>& z)
+    {
+         return Interval<Scalar>(x * z.upper(), x * z.lower());
+    }
     
     template <typename Scalar1, typename Scalar2>
     FORCEINLINE 
     Interval<typename Promote<Scalar1, Scalar2>::RT> operator+(const Interval<Scalar1>& z1,
-                                                                        const Interval<Scalar2>& z2)
+                                                               const Interval<Scalar2>& z2)
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Interval<RT>(z1.lower() + z2.lower(), z1.upper() + z2.upper());
@@ -284,7 +300,7 @@ namespace mt
     template <typename Scalar1, typename Scalar2>
     FORCEINLINE 
     Interval<typename Promote<Scalar1, Scalar2>::RT> operator-(const Interval<Scalar1>& z1,
-                                                                        const Interval<Scalar2>& z2)
+                                                               const Interval<Scalar2>& z2)
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Interval<RT>(z1.lower() - z2.upper(), z1.upper() - z2.lower());

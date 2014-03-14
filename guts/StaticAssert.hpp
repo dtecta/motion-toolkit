@@ -15,23 +15,11 @@
 #ifndef GUTS_STATICASSERT_HPP
 #define GUTS_STATICASSERT_HPP
 
-#include "Meta.hpp"
-
 #define GLUE(a, b) a##b
 #define UBERGLUE(a, b) GLUE(a, b)
 
 #define STATIC_ASSERT(expr) \
-    typedef typename guts::If<bool(expr), guts::StaticAssertionSuccess, guts::StaticAssertionFailure>::RT::CompileTimeError UBERGLUE(Line, __LINE__)
-
-namespace guts
-{
-    struct StaticAssertionFailure;
-
-    struct StaticAssertionSuccess
-    {
-        typedef int CompileTimeError;
-    };
-}
+    struct UBERGLUE(Line, __LINE__) { int CompileTimeError : int(expr); } 
 
 #endif
 

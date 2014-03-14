@@ -19,6 +19,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include <guts/Singleton.hpp>
+
 namespace guts
 {  
     class OutputStream
@@ -29,8 +31,14 @@ namespace guts
     };
 
     class Log
+        : public guts::Singleton<Log>
     {
-    public:
+    public:  
+        Log() 
+            : mOutputStream(0)
+            , mSeverityLevel(INFO)
+        {}
+
         enum Severity
         {
             DEBUG = 0,
@@ -41,11 +49,6 @@ namespace guts
         
         enum { MAXSIZE = 1024 };
 
-        static Log& instance()
-        {
-            static Log theLog;
-            return theLog;
-        }
 
         void notify(Severity severity, const char* format, ...)
         {
@@ -72,13 +75,6 @@ namespace guts
         }
 
     private:
-        Log() 
-            : mOutputStream(0)
-            , mSeverityLevel(INFO)
-        {}
-
-        ~Log() {}
-
         OutputStream* mOutputStream;
         Severity mSeverityLevel;
     };

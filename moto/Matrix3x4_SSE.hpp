@@ -31,8 +31,8 @@ namespace mt
         Matrix3x4(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3);
         Matrix3x4(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2);
         Matrix3x4(const __m128& r0, const __m128& r1, const __m128& r2);
-        explicit Matrix3x4(const Vector3<float>& p);
-        explicit Matrix3x4(const Matrix3x3<float>& a, const Vector3<float>& p = Zero());
+        Matrix3x4(const Vector3<float>& p);
+        Matrix3x4(const Matrix3x3<float>& a, const Vector3<float>& p = Zero());
         
         operator const Vector4<float>*() const; 
         operator Vector4<float>*();
@@ -56,7 +56,7 @@ namespace mt
         Vector4<float> mRow[3];
     };
 
-    Vector4<float> mul(const Matrix3x4<float>& a, const Vector4<float>& v);
+    Vector3<float> mul(const Matrix3x4<float>& a, const Vector4<float>& v);
     Vector4<float> mul(const Vector4<float>& v, const Matrix3x4<float>& a);
     
     
@@ -216,16 +216,16 @@ namespace mt
 
 
 	FORCEINLINE 
-    Vector4<float> mul(const Matrix3x4<float>& a, const Vector4<float>& v)
+    Vector3<float> mul(const Matrix3x4<float>& a, const Vector4<float>& v)
     {
         __m128 tmp0 = _mm_mul_ps(a[0].vec, v.vec);
         __m128 tmp1 = _mm_mul_ps(a[1].vec, v.vec);
         __m128 tmp2 = _mm_mul_ps(a[2].vec, v.vec);
-        __m128 tmp3 = _mm_setr_ps(float(), float(), float(), v.w);
+        __m128 tmp3;
 
         transpose(tmp0, tmp1, tmp2, tmp3);
 
-        return Vector4<float>(_mm_add_ps(_mm_add_ps(_mm_add_ps(tmp0, tmp1), tmp2), tmp3));
+        return xyz(Vector4<float>(_mm_add_ps(_mm_add_ps(_mm_add_ps(tmp0, tmp1), tmp2), tmp3)));
     }
 
 

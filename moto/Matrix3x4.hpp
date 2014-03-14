@@ -32,8 +32,8 @@ namespace mt
         template <typename Scalar2> explicit Matrix3x4(const Scalar2* v);   
         Matrix3x4(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3);
 		Matrix3x4(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2);
-        explicit Matrix3x4(const Vector3<Scalar>& p);
-        explicit Matrix3x4(const Matrix3x3<Scalar>& a, const Vector3<Scalar>& p = Zero());
+        Matrix3x4(const Vector3<Scalar>& p);
+        Matrix3x4(const Matrix3x3<Scalar>& a, const Vector3<Scalar>& p = Zero());
         
         operator const Vector4<Scalar>*() const; 
         operator Vector4<Scalar>*();
@@ -78,7 +78,7 @@ namespace mt
 
 #endif
    
-    template <typename Scalar> Vector4<Scalar> mul(const Matrix3x4<Scalar>& a, const Vector4<Scalar>& v);
+    template <typename Scalar> Vector3<Scalar> mul(const Matrix3x4<Scalar>& a, const Vector4<Scalar>& v);
 	template <typename Scalar> Vector4<Scalar> mul(const Vector4<Scalar>& v, const Matrix3x4<Scalar>& a);
 
     template <typename Scalar> Matrix3x4<Scalar> mul(const Matrix3x4<Scalar>& a, const Matrix3x4<Scalar>& b);
@@ -86,6 +86,8 @@ namespace mt
     template <typename Scalar> Matrix3x4<Scalar> inverse(const Matrix3x4<Scalar>& a);
     template <typename Scalar> Matrix3x4<Scalar> inverseOrthogonal(const Matrix3x4<Scalar>& a);  
     
+    template <typename Scalar> Matrix3x4<Scalar> lookat(const Vector3<Scalar>& eye, const Vector3<Scalar>& center, const Vector3<Scalar>& up);
+
     template <typename Scalar1, typename Scalar2> void convert(Scalar1* v, const Matrix3x4<Scalar2>& a);
 
 
@@ -303,12 +305,11 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Vector4<Scalar> mul(const Matrix3x4<Scalar>& a, const Vector4<Scalar>& v)
+    Vector3<Scalar> mul(const Matrix3x4<Scalar>& a, const Vector4<Scalar>& v)
     {
-        return Vector4<Scalar>(dot(a[0], v), 
+        return Vector3<Scalar>(dot(a[0], v), 
                                dot(a[1], v), 
-                               dot(a[2], v),
-			                   v.w);
+                               dot(a[2], v));
     }
 
     template <typename Scalar>
@@ -344,6 +345,17 @@ namespace mt
 
         return Matrix3x4<Scalar>(invBasis, mul(invBasis, -origin(a)));
     }  
+
+    template <typename Scalar>
+    FORCEINLINE
+    Matrix3x4<Scalar> lookat(const Vector3<Scalar>& eye, const Vector3<Scalar>& center, const Vector3<Scalar>& up)
+    {
+        Vector3<Scalar> z = normalize(eye - center);
+        Vector3<Scalar> x = normalize(cross(up, z));
+        Vector3<Scalar> y = cross(z, x);
+        return Matrix3x4<Scalar>(x, y, z, eye);
+    }
+
 
     template <typename Scalar1, typename Scalar2> 
     FORCEINLINE 
