@@ -19,6 +19,7 @@
 
 namespace guts
 {
+    // !! RefCounted must be the first inherited class
     class RefCounted
     {
     public:

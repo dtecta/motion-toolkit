@@ -41,6 +41,8 @@ namespace mt
     template <typename Scalar> Vector3<Scalar> closest(const Vector3<Dual<Scalar> >& v);
     template <typename Scalar> Scalar pitch(const Vector3<Dual<Scalar> >& v);
 
+    template <typename Scalar> Vector3<Scalar> linvel(const Vector3<Dual<Scalar> >& v, const Vector3<Scalar>& p);
+
 #ifdef USE_OSTREAM
     template <typename CharT, typename Traits, typename Scalar> 
     std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const Vector3<Dual<Scalar> >& a);
@@ -51,28 +53,28 @@ namespace mt
     template <typename Scalar> 
     Vector3<Dual<Scalar> > makeDual(const Vector3<Scalar>& u, const Vector3<Scalar>& v)
     {
-        return Vector3<Dual<Scalar> >(makeDual(u[0], v[0]), makeDual(u[1], v[1]), makeDual(u[2], v[2]));    
+        return Vector3<Dual<Scalar> >(makeDual(u.x, v.x), makeDual(u.y, v.y), makeDual(u.z, v.z));    
     }
 
     template <typename Scalar>
     FORCEINLINE
     Vector3<Scalar> real(const Vector3<Dual<Scalar> >& v)
     {   
-        return Vector3<Scalar>(real(v[0]), real(v[1]), real(v[2]));
+        return Vector3<Scalar>(real(v.x), real(v.y), real(v.z));
     }  
     
     template <typename Scalar>
     FORCEINLINE
     Vector3<Scalar> dual(const Vector3<Dual<Scalar> >& v)
     {   
-        return Vector3<Scalar>(dual(v[0]), dual(v[1]), dual(v[2]));
+        return Vector3<Scalar>(dual(v.x), dual(v.y), dual(v.z));
     }  
     
     template <typename Scalar>
     FORCEINLINE
     Vector3<Dual<Scalar> > conj(const Vector3<Dual<Scalar> >& v)
     {   
-        return Vector3<Dual<Scalar> >(conj(v[0]), conj(v[1]), conj(v[2]));
+        return Vector3<Dual<Scalar> >(conj(v.x), conj(v.y), conj(v.z));
     } 
 
     template <typename Scalar> 
@@ -105,6 +107,12 @@ namespace mt
     Scalar pitch(const Vector3<Dual<Scalar> >& v)
     {
         return dot(real(v), dual(v)) / lengthSquared(real(v));
+    }   
+
+    template <typename Scalar> 
+    Vector3<Scalar> linvel(const Vector3<Dual<Scalar> >& v, const Vector3<Scalar>& p)
+    {
+        return dual(v) + cross(real(v), p); 
     }
 
 #ifdef USE_OSTREAM

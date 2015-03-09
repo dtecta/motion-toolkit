@@ -168,8 +168,8 @@ namespace mt
     FORCEINLINE 
     Matrix2x2<Scalar>::Matrix2x2(const Vector2<Scalar>& c0, const Vector2<Scalar>& c1)
     {
-        setValue(c0[0], c1[0],
-                 c0[1], c1[1]);
+        setValue(c0.x, c1.x,
+                 c0.y, c1.y);
     }
    
     template <typename Scalar>
@@ -333,7 +333,7 @@ namespace mt
     FORCEINLINE 
     Scalar tdot(const Matrix2x2<Scalar>& a, int i, const Vector2<Scalar>& v)
     {
-        return a[0][i] * v[0] + a[1][i] * v[1];
+        return a[0][i] * v.x + a[1][i] * v.y;
     }
     
     template <typename Scalar>

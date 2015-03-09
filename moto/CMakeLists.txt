@@ -6,10 +6,10 @@ add_executable(moto
   Diagonal3.hpp
   Dual.hpp
   DualMatrix3x3.hpp
+  DualVector2.hpp
   DualVector3.hpp
   DualVector4.hpp
   ErrorTracer.hpp
-  EulerAngles.hpp
   Interval.hpp
   Matrix2x2.hpp
   Matrix3x3.hpp
@@ -33,4 +33,6 @@ add_executable(moto
 add_dependencies(moto consolid) 
 set_target_properties(moto PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries(moto consolid)
-
+if(UNIX)
+target_link_libraries(moto pthread)
+endif()

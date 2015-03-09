@@ -36,7 +36,7 @@ namespace guts
         Key pop();
  
     private:
-        static const size_t NO_REF = ~0;   
+        static const size_t NO_REF = size_t(~0);   
         static const size_t PARENT_REF = 1 << 31;      
 
         struct Node

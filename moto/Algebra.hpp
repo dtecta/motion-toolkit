@@ -215,14 +215,14 @@ namespace mt
 
     template <typename Element>
     FORCEINLINE
-    Zero operator*(const Element& e, Zero)
+    Zero operator*(const Element&, Zero)
     {
         return Zero();
     }
     
     template <typename Element>
     FORCEINLINE
-    Zero operator*(Zero, const Element& e)
+    Zero operator*(Zero, const Element&)
     {
         return Zero();
     } 
@@ -254,14 +254,14 @@ namespace mt
 
     template <typename Element>
     FORCEINLINE
-    Zero mul(const Element& e, Zero)
+    Zero mul(const Element&, Zero)
     {
         return Zero();
     }
     
     template <typename Element>
     FORCEINLINE
-    Zero mul(Zero, const Element& e)
+    Zero mul(Zero, const Element&)
     {
         return Zero();
     } 
@@ -294,14 +294,14 @@ namespace mt
 
     template <typename Vector> 
     FORCEINLINE 
-    Zero dot(Zero, const Vector& v)
+    Zero dot(Zero, const Vector&)
     { 
         return Zero(); 
     }
 
     template <typename Vector> 
     FORCEINLINE 
-    Zero dot(const Vector& v, Zero)
+    Zero dot(const Vector&, Zero)
     { 
         return Zero(); 
     }

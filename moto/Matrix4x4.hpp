@@ -66,6 +66,8 @@ namespace mt
     template <int I, int J, typename Scalar> Scalar cofactor(const Matrix4x4<Scalar>& a);
 
     template <typename Scalar> Vector4<Scalar> row(const Matrix4x4<Scalar>& a, int i);
+    template <typename Scalar> Vector4<Scalar> column(const Matrix4x4<Scalar>& a, int i);
+    
     template <typename Scalar> Matrix3x3<Scalar> basis(const Matrix4x4<Scalar>& a);
     template <typename Scalar> Vector3<Scalar> origin(const Matrix4x4<Scalar>& a); 
 
@@ -298,6 +300,13 @@ namespace mt
         return a[(I + 1) & 3][(J + 1) & 3] * (a[(I + 2) & 3][(J + 2) & 3] * a[(I + 3) & 3][(J + 3) & 3] - a[(I + 3) & 3][(J + 2) & 3] * a[(I + 2) & 3][(J + 3) & 3]) + 
                a[(I + 2) & 3][(J + 1) & 3] * (a[(I + 3) & 3][(J + 2) & 3] * a[(I + 1) & 3][(J + 3) & 3] - a[(I + 1) & 3][(J + 2) & 3] * a[(I + 3) & 3][(J + 3) & 3]) + 
                a[(I + 3) & 3][(J + 1) & 3] * (a[(I + 1) & 3][(J + 2) & 3] * a[(I + 2) & 3][(J + 3) & 3] - a[(I + 2) & 3][(J + 2) & 3] * a[(I + 1) & 3][(J + 3) & 3]);
+    }   
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Vector4<Scalar> row(const Matrix4x4<Scalar>& a, int i)
+    {
+        return a[i];
     }  
 
     template <typename Scalar>

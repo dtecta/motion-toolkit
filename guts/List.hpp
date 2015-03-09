@@ -42,14 +42,18 @@ namespace guts
         void insert(Link* link)
         {
             mNext = link;
-            mPrev = link->mPrev;
-            mNext->mPrev = this; 
+            do
+            {
+                mPrev = link->mPrev;
+            }
+            while (INTERLOCKED_COMPARE_EXCHANGE_POINTER(&link->mPrev, this, mPrev) != mPrev);
             mPrev->mNext = this;
         } 
 
         void remove()
         {
-            mNext->mPrev = mPrev;
+            while (INTERLOCKED_COMPARE_EXCHANGE_POINTER(&mNext->mPrev, mPrev, this) != this)
+                ;
             mPrev->mNext = mNext;
             mNext = mPrev = this;
         }
@@ -60,8 +64,8 @@ namespace guts
         }
 
     private: 
-        Link* mNext;
-        Link* mPrev;
+        Link* volatile mNext;
+        Link* volatile mPrev;
     };
 
 

@@ -78,6 +78,10 @@ typedef unsigned __int64 uint64_t;
 #   endif
 #endif
 
+#ifndef UNUSED
+#   define UNUSED(arg) 
+#endif
+
 #if USE_ROUNDING_CONTROL
 #   if defined(_MSC_VER)
 #      include <float.h>

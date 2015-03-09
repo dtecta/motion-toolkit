@@ -73,7 +73,7 @@ namespace mt
     template <typename Scalar2>
     FORCEINLINE
     BBox3<Scalar>::BBox3(const Vector3<Scalar2>& v)
-        : Vector3<Interval<Scalar> >(v[0], v[1], v[2])
+        : Vector3<Interval<Scalar> >(v.x, v.y, v.z)
     {}
     
     template <typename Scalar>
@@ -106,42 +106,42 @@ namespace mt
     FORCEINLINE 
     Vector3<Scalar> lower(const BBox3<Scalar>& b)
     {
-        return Vector3<Scalar>(lower(b[0]), lower(b[1]), lower(b[2]));
+        return Vector3<Scalar>(lower(b.x), lower(b.y), lower(b.z));
     }
     
     template <typename Scalar>
     FORCEINLINE 
     Vector3<Scalar> upper(const BBox3<Scalar>& b)
     {
-        return Vector3<Scalar>(upper(b[0]), upper(b[1]), upper(b[2]));
+        return Vector3<Scalar>(upper(b.x), upper(b.y), upper(b.z));
     }
 
     template <typename Scalar>
     FORCEINLINE 
     Vector3<Scalar> width(const BBox3<Scalar>& b)
     {
-        return Vector3<Scalar>(width(b[0]), width(b[1]), width(b[2]));
+        return Vector3<Scalar>(width(b.x), width(b.y), width(b.z));
     }
 
     template <typename Scalar>
     FORCEINLINE 
     Vector3<Scalar> median(const BBox3<Scalar>& b)
     {
-        return Vector3<Scalar>(median(b[0]), median(b[1]), median(b[2]));
+        return Vector3<Scalar>(median(b.x), median(b.y), median(b.z));
     }
     
     template <typename Scalar>
     FORCEINLINE 
     BBox3<Scalar> hull(const Vector3<Scalar>& v1, const Vector3<Scalar>& v2)
     {
-        return BBox3<Scalar>(hull(v1[0], v2[0]), hull(v1[1], v2[1]), hull(v1[2], v2[2]));
+        return BBox3<Scalar>(hull(v1.x, v2.x), hull(v1.y, v2.y), hull(v1.z, v2.z));
     }
    
     template <typename Scalar>
     FORCEINLINE 
     BBox3<Scalar> hull(const BBox3<Scalar>& b, const Vector3<Scalar>& v)
     {
-        return BBox3<Scalar>(hull(b[0], v[0]), hull(b[1], v[1]), hull(b[2], v[2]));
+        return BBox3<Scalar>(hull(b.x, v.x), hull(b.y, v.y), hull(b.z, v.z));
     }
 
     template <typename Scalar>
@@ -155,21 +155,21 @@ namespace mt
     FORCEINLINE 
     BBox3<Scalar> hull(const BBox3<Scalar>& b1, const BBox3<Scalar>& b2)
     {
-        return BBox3<Scalar>(hull(b1[0], b2[0]), hull(b1[1], b2[1]), hull(b1[2], b2[2]));
+        return BBox3<Scalar>(hull(b1.x, b2.x), hull(b1.y, b2.y), hull(b1.z, b2.z));
     }
 
     template <typename Scalar>
     FORCEINLINE 
     bool overlap(const BBox3<Scalar>& b1, const BBox3<Scalar>& b2)
     {
-        return overlap(b1[0], b2[0]) && overlap(b1[1], b2[1]) && overlap(b1[2], b2[2]);
+        return overlap(b1.x, b2.x) && overlap(b1.y, b2.y) && overlap(b1.z, b2.z);
     }
     
     template <typename Scalar>
     FORCEINLINE 
     bool subset(const BBox3<Scalar>& b1, const BBox3<Scalar>& b2)
     {
-        return subset(b1[0], b2[0]) && subset(b1[1], b2[1]) && subset(b1[2], b2[2]);
+        return subset(b1.x, b2.x) && subset(b1.y, b2.y) && subset(b1.z, b2.z);
     }
     
     
@@ -177,14 +177,14 @@ namespace mt
     FORCEINLINE 
     bool in(const Vector3<Scalar>& v, const BBox3<Scalar>& b)
     {
-        return in(v[0], b[0]) && in(v[1], b[1]) && in(v[2], b[2]);
+        return in(v.x, b.x) && in(v.y, b.y) && in(v.z, b.z);
     }
     
     template <typename Scalar>
     FORCEINLINE 
     BBox3<Scalar> clamp(const BBox3<Scalar>& b1, const BBox3<Scalar>& b2)
     {
-        return BBox3<Scalar>(clamp(b1[0], b2[0]), clamp(b1[1], b2[1]), clamp(b1[2], b2[2]));
+        return BBox3<Scalar>(clamp(b1.x, b2.x), clamp(b1.y, b2.y), clamp(b1.z, b2.z));
     }
 }
 
