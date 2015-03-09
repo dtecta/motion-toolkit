@@ -89,7 +89,8 @@ namespace mt
     FORCEINLINE
     float Random<float>::uniform()
     {
-        return bitcast<float>(0x3f800000UL | (rand() & 0x007fffffUL)) - 1.0f;
+		uint32_t bits = 0x3f800000UL | (rand() & 0x007fffffUL);
+        return bitcast<float>(bits) - 1.0f;
     }
 
 #endif

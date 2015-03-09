@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "consolid.h"
 
 #include <time.h>
 #include <sys/types.h>

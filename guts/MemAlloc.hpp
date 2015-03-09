@@ -15,7 +15,7 @@
 #ifndef GUTS_MEMALLOC_HPP
 #define GUTS_MEMALLOC_HPP
 
-#include <stdexcept>
+#include <new>
 
 #if USE_SSE
 
