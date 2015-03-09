@@ -4,12 +4,12 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-project(moto)
+project(motion-toolkit)
 
 set(CMAKE_DEBUG_POSTFIX  "_d")
 
 include_directories(
-  ${moto_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}
 )
 
 if(MSVC) 
@@ -29,12 +29,12 @@ endif(UNIX)
 
 if(UNIX AND NOT WIN32 AND NOT APPLE)
   if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-      set(LIB_POSTFIX "64" CACHE STRING "suffix for 32/64 dir placement")
-      mark_as_advanced(LIB_POSTFIX)
+    set(LIB_POSTFIX "64" CACHE STRING "suffix for 32/64 dir placement")
+    mark_as_advanced(LIB_POSTFIX)
   endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
 endif(UNIX AND NOT WIN32 AND NOT APPLE)
 if(NOT DEFINED LIB_POSTFIX)
-    set(LIB_POSTFIX "")
+  set(LIB_POSTFIX "")
 endif(NOT DEFINED LIB_POSTFIX)
 
 add_subdirectory(consolid)

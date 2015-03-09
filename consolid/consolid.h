@@ -30,7 +30,9 @@
 #   pragma warning(disable: 4800) 
 #endif 
 
-#if defined(_MSC_VER)
+
+
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
 
 typedef signed __int8  int8_t;
 typedef signed __int16 int16_t;
@@ -41,16 +43,6 @@ typedef unsigned __int8  uint8_t;
 typedef unsigned __int16 uint16_t;
 typedef unsigned __int32 uint32_t;
 typedef unsigned __int64 uint64_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int snprintf(char* str, size_t size, const char* format, ...);
-
-#ifdef __cplusplus
-}
-#endif
 
 #else
 
@@ -129,6 +121,33 @@ int snprintf(char* str, size_t size, const char* format, ...);
 #   define INTERLOCKED_COMPARE_EXCHANGE_POINTER(ptr, newval, oldval) __sync_val_compare_and_swap(ptr, oldval, newval)
 #else
 #   error "Platform does not support atomic primitives"
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int64_t  getPerformanceCounter(void);
+int64_t  getPerformanceFrequency(void);
+
+uint32_t getCurrentProcessId(void);
+uint32_t getCurrentThreadId(void);
+uint32_t getCurrentProcessorNumber(void);
+
+uint32_t tlsAlloc(void);
+int      tlsFree(uint32_t);
+int      tlsSetValue(uint32_t, void*);
+void*    tlsGetValue(uint32_t);
+
+#if defined(_MSC_VER)
+
+int      snprintf(char* str, size_t size, const char* format, ...);
+
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

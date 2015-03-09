@@ -15,7 +15,6 @@
 #ifndef MT_RANDOM_HPP
 #define MT_RANDOM_HPP
 
-#include <consolid/rand32.h>
 #include <complex>
 
 #include <moto/Scalar.hpp>
@@ -27,34 +26,74 @@
 namespace mt
 {
     template <typename Scalar>
-    struct Random
+    class Random
     {  
-        static Scalar uniform();
-        static Scalar uniform(Scalar a, Scalar b);
-        static Scalar angle();  
-		static Vector2<Scalar> uniformVector2();
-        static Vector2<Scalar> uniformVector2(Scalar a, Scalar b);
-        static Vector3<Scalar> uniformVector3();
-        static Vector3<Scalar> uniformVector3(Scalar a, Scalar b);
-        static Vector3<Scalar> direction();
-        static Vector4<Scalar> rotation();
+    public:
+        Random(uint32_t seed = 12345UL);
+
+        uint32_t rand();
+        uint32_t seed() const;
+        void setSeed(uint32_t seed);
+
+        Scalar uniform();
+        Scalar uniform(Scalar a, Scalar b);
+        Scalar angle();
+        Vector2<Scalar> uniformVector2();
+        Vector2<Scalar> uniformVector2(Scalar a, Scalar b);
+        Vector3<Scalar> uniformVector3();
+        Vector3<Scalar> uniformVector3(Scalar a, Scalar b);
+        Vector3<Scalar> direction();
+        Vector4<Scalar> rotation();
+
+    private:
+        uint32_t mSeed;
     };
 
+
+    template<typename Scalar>
+    Random<Scalar>::Random(uint32_t seed)
+        : mSeed(seed)
+    {}
+
+
+    template<typename Scalar>
+    uint32_t Random<Scalar>::rand()
+    {
+         mSeed = 1664525UL * mSeed + 1013904223UL;
+         return mSeed;
+    }
+    
+    template<typename Scalar>
+    uint32_t Random<Scalar>::seed() const
+    {
+         return mSeed;
+    }
+    
+    template<typename Scalar>
+    void Random<Scalar>::setSeed(uint32_t seed)
+    {
+        mSeed = seed;
+    }
     
     template <typename Scalar>
     FORCEINLINE
     Scalar Random<Scalar>::uniform()
-    {
-        return Scalar(rand32()) / Scalar(std::numeric_limits<unsigned long>::max());
+    { 
+        static const Scalar ONE_OVER_MAX_UINT32 = Scalar(1) / Scalar(std::numeric_limits<uint32_t>::max());
+        return Scalar(rand()) * ONE_OVER_MAX_UINT32;
     }
-    
+
+#if USE_IEEE_754 
+
     template <>
     FORCEINLINE
     float Random<float>::uniform()
     {
-        return frand32();
+        return bitcast<float>(0x3f800000UL | (rand() & 0x007fffffUL)) - 1.0f;
     }
-    
+
+#endif
+     
     template <typename Scalar>
     FORCEINLINE
     Scalar Random<Scalar>::uniform(Scalar a, Scalar b)

@@ -31,7 +31,7 @@
 namespace mt
 {  
     template <typename Scalar> Scalar acos(Scalar x);
-    template <typename To, typename From> To bitCast(From from);
+    template <typename To, typename From> To bitcast(From from);
     
     template <typename Scalar> bool isnan(Scalar a); 
     template <typename Scalar> bool isinf(Scalar a); 
@@ -100,7 +100,7 @@ namespace mt
 
     template <typename To, typename From> 
     FORCEINLINE
-    To bitCast(From from)
+    To bitcast(From from)
     {
         STATIC_ASSERT(sizeof(To) == sizeof(From));
 
@@ -311,40 +311,39 @@ namespace mt
     FORCEINLINE
     bool isnan(float a) 
     {
-        return (bitCast<int32_t>(a) & 0x7fffffff) > 0x7f800000;
+        return (bitcast<int32_t>(a) & 0x7fffffff) > 0x7f800000;
     }
 
     FORCEINLINE
     bool isinf(float a) 
     {
-        return (bitCast<int32_t>(a) & 0x7fffffff) == 0x7f800000;
+        return (bitcast<int32_t>(a) & 0x7fffffff) == 0x7f800000;
     }
 
     FORCEINLINE
     bool isfinite(float a) 
     {
-        return (bitCast<int32_t>(a) & 0x7fffffff) < 0x7f800000;
+        return (bitcast<int32_t>(a) & 0x7fffffff) < 0x7f800000;
     }
 
     FORCEINLINE
     bool ispositive(float a) 
     {
-        return bitCast<int32_t>(a) > 0;
+        return bitcast<int32_t>(a) > 0;
     }
 
     FORCEINLINE
     bool isnegative(float a) 
     {
-        return (bitCast<int32_t>(a) ^ int32_t(0x80000000)) > 0;
+        return (bitcast<int32_t>(a) ^ int32_t(0x80000000)) > 0;
     }
 
     FORCEINLINE
     bool iszero(float a) 
     {
-        return (bitCast<int32_t>(a) & 0x7fffffff) == 0;
+        return (bitcast<int32_t>(a) & 0x7fffffff) == 0;
     }
  
-#if 1
     // Quick and dirty float comparison using a cast to integers.
     // NB: This function is limited to non-negative numbers.
     // NB2: Negative zero is regarded negative in this context 
@@ -352,24 +351,23 @@ namespace mt
     FORCEINLINE
     bool isequalnn(float a, float b) 
     { 
-        ASSERT((bitCast<int32_t>(a) & int32_t(0x80000000)) == 0 && (bitCast<int32_t>(b) & int32_t(0x80000000)) == 0);
-        return bitCast<int32_t>(a) == bitCast<int32_t>(b);
+        ASSERT((bitcast<int32_t>(a) & int32_t(0x80000000)) == 0 && (bitcast<int32_t>(b) & int32_t(0x80000000)) == 0);
+        return bitcast<int32_t>(a) == bitcast<int32_t>(b);
     } 
 
     FORCEINLINE
     bool islessnn(float a, float b) 
     {  
-		ASSERT((bitCast<int32_t>(a) & int32_t(0x80000000)) == 0 && (bitCast<int32_t>(b) & int32_t(0x80000000)) == 0);
-        return bitCast<int32_t>(a) < bitCast<int32_t>(b);
+		ASSERT((bitcast<int32_t>(a) & int32_t(0x80000000)) == 0 && (bitcast<int32_t>(b) & int32_t(0x80000000)) == 0);
+        return bitcast<int32_t>(a) < bitcast<int32_t>(b);
     } 
-#endif
 
     FORCEINLINE
     float sign(float x) 
     {
-        int32_t i = bitCast<int32_t>(x) ;
+        int32_t i = bitcast<int32_t>(x) ;
         int32_t nosign = i & 0x7fffffff;
-        return bitCast<float>((nosign != 0) * ((i & int32_t(0x80000000)) | 0x3f800000));  
+        return bitcast<float>((nosign != 0) * ((i & int32_t(0x80000000)) | 0x3f800000));  
     }
 
 #if APPROX_RECIPROCAL_SQRT
@@ -379,9 +377,9 @@ namespace mt
     {
         ASSERT(ispositive(x)); 
         float xhalf = x * 0.5f;
-        int32_t i = bitCast<int32_t>(x);
+        int32_t i = bitcast<int32_t>(x);
         i = 0x5f3759df - (i >> 1);
-        x = bitCast<float>(i);
+        x = bitcast<float>(i);
         x = x * (1.5f - x * x * xhalf);
         return x;
     }

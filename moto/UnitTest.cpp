@@ -38,6 +38,8 @@ typedef mt::Vector3<Dual> DualVector3;
 typedef mt::Vector4<Dual> DualQuaternion;
 typedef mt::Matrix3x3<Dual> DualMatrix3x3;
 
+typedef mt::Random<Scalar> Random;
+
 // These are types and templates that represent algebraic constants. We will use them in constructors of our vector and matrix types
 using mt::Identity; // The identity for "mul" in all types
 using mt::Zero; // The additive zero (in vector classes)
@@ -149,16 +151,18 @@ int main()
 
     // PLUECKER COORDINATES
 
+    Random random;
+
     // These are two random points inside a cube of size 20.     
-    Vector3 p1 = mt::Random<Scalar>::uniformVector3(-10, 10);
-    Vector3 q1 = mt::Random<Scalar>::uniformVector3(-10, 10);
+    Vector3 p1 = random.uniformVector3(-10, 10);
+    Vector3 q1 = random.uniformVector3(-10, 10);
 
     // Pluecker coordinates of the line through p and q
     DualVector3 linep1q1 = makeLine(p1, q1);
 
     // Generate a second line 
-    Vector3 p2 = mt::Random<Scalar>::uniformVector3(-10, 10);
-    Vector3 q2 = mt::Random<Scalar>::uniformVector3(-10, 10);
+    Vector3 p2 = random.uniformVector3(-10, 10);
+    Vector3 q2 = random.uniformVector3(-10, 10);
 
     // Pluecker coordinates of the line through p2 and q2
     DualVector3 linep2q2 = makeLine(p2, q2);
@@ -191,13 +195,13 @@ int main()
     // RIGID BODY TRANSFORMATIONS
 
     // Generate a random orientation. This quaternion is used for constructing a random rigid body transformation
-    Quaternion orn = mt::Random<Scalar>::rotation();
+    Quaternion orn = random.rotation();
 
     // A 3x3 basis at an arbitrary orientation is created.
     Matrix3x3 basis(orn);
 
     // The coordinate system is placed at an origin inside the same cube of size 20
-    Vector3 origin = mt::Random<Scalar>::uniformVector3(-10, 10);
+    Vector3 origin = random.uniformVector3(-10, 10);
 
     // These are the points p and q after being transformed  
     Vector3 tp1 = mul(basis, p1) + origin;
@@ -250,8 +254,8 @@ int main()
     DualMatrix3x3 diff = xform - xform2;
 
     // We generate another rigid body pose
-    Quaternion orn2 = mt::Random<Scalar>::rotation();
-    Vector3 origin2 = mt::Random<Scalar>::uniformVector3(-10, 10);
+    Quaternion orn2 = random.rotation();
+    Vector3 origin2 = random.uniformVector3(-10, 10);
 
     DualQuaternion dq2 = rigid(orn2, origin2);
 
@@ -267,7 +271,7 @@ int main()
     // Method #1: normalized lerp: normalize(lerp(dq, dq2, t)). 
     //            This one is commonly used in dual quaternion skinning since it is the simplest and is applicable to more than two poses.
 
-    Scalar t = mt::Random<Scalar>::uniform();
+    Scalar t = random.uniform();
 
     DualQuaternion method1 = nlerp(dq, dq2, t);
 

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <guts/Set.hpp>
 #include <guts/String.hpp>
-#include <consolid/rand32.h>
 
 typedef guts::BinomialQueue<int> Queue_t;
 
@@ -15,7 +14,7 @@ void testQueue()
     for (int i = 0; i != 100; ++i)
     {
 
-        int x = rand32() % 97; 
+        int x = rand() % 97; 
         
         std::cout << x << ' ';
 
@@ -46,11 +45,11 @@ void initNames()
 {
     for (int i = 0; i != INT_RANGE; ++i)
     {
-        int length = rand32() % 32;
+        int length = rand() % 32;
         names[i].resize(length);
         for (int j = 0; j != length; ++j)
         {
-            names[i][j] = 'A' + (rand32() % 26);
+            names[i][j] = 'A' + (rand() % 26);
         }
     }
 }
@@ -67,7 +66,7 @@ void testHashTable()
 
     for (int i = 0; i != NUM_ITER; ++i)
     {
-        guts::String x = names[rand32() % INT_RANGE]; 
+        guts::String x = names[rand() % INT_RANGE]; 
         
         if (hashTable.retrieve(x) == 0)
         {
@@ -80,7 +79,7 @@ void testHashTable()
 
     while (!hashTable.empty())
     {
-        guts::String x = names[rand32() % INT_RANGE];
+        guts::String x = names[rand() % INT_RANGE];
         if (hashTable.retrieve(x) != 0)
         {
             hashTable.remove(x);
@@ -96,7 +95,7 @@ void testSet()
 
     for (int i = 0; i != NUM_ITER; ++i)
     {
-        guts::String x = names[rand32() % INT_RANGE]; 
+        guts::String x = names[rand() % INT_RANGE]; 
         
         if (set.find(x) == set.end())
         {
@@ -109,7 +108,7 @@ void testSet()
 
     while (!set.empty())
     {
-        guts::String x = names[rand32() % INT_RANGE];
+        guts::String x = names[rand() % INT_RANGE];
         if (set.find(x) != set.end())
         {
             set.erase(x);
