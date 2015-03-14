@@ -99,29 +99,29 @@ namespace mt
     FORCEINLINE
     Scalar Random<Scalar>::uniform(Scalar a, Scalar b)
     {
-        return lerp(a, b, Random<Scalar>::uniform());
+        return lerp(a, b, uniform());
     }
 
     template <typename Scalar>
     FORCEINLINE
     Scalar Random<Scalar>::angle()
     {
-        return Random<Scalar>::uniform(-ScalarTraits<Scalar>::pi(), ScalarTraits<Scalar>::pi());
+        return uniform(-ScalarTraits<Scalar>::pi(), ScalarTraits<Scalar>::pi());
     } 
 
 	template <typename Scalar>
     Vector2<Scalar> Random<Scalar>::uniformVector2()
     {
-        Scalar x = Random<Scalar>::uniform();
-        Scalar y = Random<Scalar>::uniform();
+        Scalar x = uniform();
+        Scalar y = uniform();
         return Vector2<Scalar>(x, y);
     }
 
     template <typename Scalar>
     Vector2<Scalar> Random<Scalar>::uniformVector2(Scalar a, Scalar b)
     {
-        Scalar x = Random<Scalar>::uniform(a, b);
-        Scalar y = Random<Scalar>::uniform(a, b);
+        Scalar x = uniform(a, b);
+        Scalar y = uniform(a, b);
         return Vector2<Scalar>(x, y);
     }
     
@@ -129,27 +129,27 @@ namespace mt
     template <typename Scalar>
     Vector3<Scalar> Random<Scalar>::uniformVector3()
     {
-        Scalar x = Random<Scalar>::uniform();
-        Scalar y = Random<Scalar>::uniform();
-        Scalar z = Random<Scalar>::uniform();
+        Scalar x = uniform();
+        Scalar y = uniform();
+        Scalar z = uniform();
         return Vector3<Scalar>(x, y, z);
     }
 
     template <typename Scalar>
     Vector3<Scalar> Random<Scalar>::uniformVector3(Scalar a, Scalar b)
     {
-        Scalar x = Random<Scalar>::uniform(a, b);
-        Scalar y = Random<Scalar>::uniform(a, b);
-        Scalar z = Random<Scalar>::uniform(a, b);
+        Scalar x = uniform(a, b);
+        Scalar y = uniform(a, b);
+        Scalar z = uniform(a, b);
         return Vector3<Scalar>(x, y, z);
     }
     
     template <typename Scalar>
     Vector3<Scalar> Random<Scalar>::direction()
     {
-        Scalar z = Random<Scalar>::uniform(Scalar(-1), Scalar(1));
+        Scalar z = uniform(Scalar(-1), Scalar(1));
         Scalar r = sqrt(Scalar(1) - square(z));
-        Scalar t = Random<Scalar>::angle();
+        Scalar t = angle();
         std::complex<Scalar> e = std::polar(r, t);
         return Vector3<Scalar>(e.real(), e.imag(), z);
     }
@@ -159,11 +159,11 @@ namespace mt
     {
         // From: "Uniform Random Rotations", Ken Shoemake, Graphics Gems III, 
         //       pg. 124-132
-        Scalar x0 = Random<Scalar>::uniform();
+        Scalar x0 = uniform();
         Scalar r1 = sqrt(Scalar(1) - x0);
         Scalar r2 = sqrt(x0);
-        Scalar t1 = Random<Scalar>::angle();
-        Scalar t2 = Random<Scalar>::angle();
+        Scalar t1 = angle();
+        Scalar t2 = angle();
         std::complex<Scalar> c1 = std::polar(r1, t1);
         std::complex<Scalar> c2 = std::polar(r2, t2);
         return Vector4<Scalar>(c1.imag(), c1.real(), c2.imag(), c2.real());

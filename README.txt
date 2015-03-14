@@ -11,12 +11,7 @@ A proper set of documentation is still pending, however I would like
 to give a preview of MoTo's features and peculiarities.
 
 First of all, since MoTo is composed of headers only, there is no need to build
-and link a library. All class and function templates are fully inlined. The
-single exception is the mt::Random class. Applications that use mt::Random
-need to link with consolid. Consolid is a thin abstraction layer that helps
-consolidating different C compilers. Consolid contains a random number
-generator that has the same behavior across different platforms.
-
+and link a library. All class and function templates are fully inlined. 
  
 Secondly, MoTo tries to mimic the Cg shader language as much as possible. This
 shows in the naming of functions, e.g. "normalize" and "saturate", but also in
@@ -28,6 +23,15 @@ mt::Matrix3x3<float> a, b, c;
 ...
 c = a * b; // performs a component-wise multiply
 c = mul(a, b); // performs a matrix product
+
+Component-wise multiplies of matrix types (operator*) are disabled by default in 
+order to avoid confusion with other matrix libraries where operator* is used as 
+algabraic product. You can enable component-wise products by setting
+
+#define USE_MATRIX_COMP_MULT 1
+
+before including the MoTo header.
+ 
 
 There is no dedicated quaternion class. In order to represent a quaternion,
 simply use mt::Vector4. Again beware   
@@ -84,7 +88,7 @@ Platforms
 MoTo has been tested on the following platforms:
 
     Linux 32-bit/64-bit  gcc 3.4
-	Win32 32-bit/64-bit	 MSVC 8.0 SP1, 9.0 SP1
+	Win32 32-bit/64-bit	 MSVC 8.0 SP1, 9.0 SP1, 10, 11, 12
 
   
 
