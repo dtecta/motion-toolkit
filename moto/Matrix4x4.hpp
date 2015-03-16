@@ -393,6 +393,8 @@ namespace mt
     FORCEINLINE
     Matrix4x4<Scalar> adjoint(const Matrix4x4<Scalar>& a)
     {
+        // From: Streaming SIMD Extensions - Inverse of 4x4 Matrix, Intel
+
         Scalar tmp[12]; /* temp array for pairs */
      
         Matrix4x4<Scalar> dst;
@@ -452,6 +454,8 @@ namespace mt
     FORCEINLINE 
     Matrix4x4<Scalar> inverse(const Matrix4x4<Scalar>& a)
     {
+        // From: Streaming SIMD Extensions - Inverse of 4x4 Matrix, Intel
+		
         Scalar tmp[12]; /* temp array for pairs */
      
         Matrix4x4<Scalar> dst;
