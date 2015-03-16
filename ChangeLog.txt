@@ -2,7 +2,7 @@
 Added wrappers for atomic intrinsics in order to remove the dependency on TBB.
 Added a thread-safe lock-free singleton base class.
 STATIC_ASSERT now can be used outside class templates.
-Changed "axisAggle" to "fromAxisAngle".
+Changed "axisAngle" to "fromAxisAngle".
 
 2013-10-4: version 0.2.3
 Fixed guts::RefPtr reference count for copy constructor 
