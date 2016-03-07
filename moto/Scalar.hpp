@@ -25,6 +25,8 @@
 namespace mt
 {  
     template <typename Scalar> Scalar acos(Scalar x);
+    template <typename Scalar> Scalar asin(Scalar x);
+
     template <typename To, typename From> To bitcast(From from);
     
     template <typename Scalar> bool isnan(Scalar a); 
@@ -63,7 +65,6 @@ namespace mt
     // All other functions are simply dumped into our namespace.
 
     using std::abs;
-    using std::asin;
     using std::atan;
     using std::atan2; 
     using std::ceil;
@@ -91,6 +92,15 @@ namespace mt
     {
         return std::acos(clamp(x, Scalar(-1), Scalar(1)));
     }
+
+    template <typename Scalar>
+    FORCEINLINE
+    Scalar asin(Scalar x)
+    {
+        return std::asin(clamp(x, Scalar(-1), Scalar(1)));
+    }
+  
+
 
     template <typename To, typename From> 
     FORCEINLINE
@@ -153,12 +163,18 @@ namespace mt
   
     template <typename Scalar>
     FORCEINLINE
+    bool signbit(Scalar a) 
+    {
+        return Scalar(1) / a < Scalar();
+    }
+  
+
+    template <typename Scalar>
+    FORCEINLINE
     bool isequalnn(Scalar a, Scalar b) 
     {
-#if 0
-        // Enable this check to see islessnn gets any negative values. 
-        ASSERT(ispositive(Scalar(1) / a) && ispositive(Scalar(1) / b));
-#endif
+      
+        ASSERT(!signbit(a) && !signbit(b));
         return a == b;
     }
 
@@ -166,10 +182,7 @@ namespace mt
     FORCEINLINE
     bool islessnn(Scalar a, Scalar b) 
     {
-#if 0
-        // Enable this check to see islessnn gets any negative values. 
-        ASSERT(ispositive(Scalar(1) / a) && ispositive(Scalar(1) / b));
-#endif
+        ASSERT(!signbit(a) && !signbit(b));
         return a < b;
     } 
 
@@ -338,6 +351,12 @@ namespace mt
         return (bitcast<int32_t>(a) & 0x7fffffff) == 0;
     }
  
+    FORCEINLINE
+    bool signbit(float a) 
+    {
+        return (bitcast<int32_t>(a) & int32_t(0x80000000)) != 0;
+    }
+ 
     // Quick and dirty float comparison using a cast to integers.
     // NB: This function is limited to non-negative numbers.
     // NB2: Negative zero is regarded negative in this context 
@@ -345,14 +364,14 @@ namespace mt
     FORCEINLINE
     bool isequalnn(float a, float b) 
     { 
-        ASSERT((bitcast<int32_t>(a) & int32_t(0x80000000)) == 0 && (bitcast<int32_t>(b) & int32_t(0x80000000)) == 0);
+        ASSERT(!signbit(a) && !signbit(b));
         return bitcast<int32_t>(a) == bitcast<int32_t>(b);
     } 
 
     FORCEINLINE
     bool islessnn(float a, float b) 
     {  
-		ASSERT((bitcast<int32_t>(a) & int32_t(0x80000000)) == 0 && (bitcast<int32_t>(b) & int32_t(0x80000000)) == 0);
+        ASSERT(!signbit(a) && !signbit(b));
         return bitcast<int32_t>(a) < bitcast<int32_t>(b);
     } 
 

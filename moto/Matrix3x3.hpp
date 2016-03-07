@@ -143,8 +143,10 @@ namespace mt
     template <typename Scalar> Matrix3x3<Scalar> inverse(const Matrix3x3<Scalar>& a);
     template <typename Scalar> Scalar trace(const Matrix3x3<Scalar>& a);  
     template <typename Scalar> Vector4<Scalar> rotation(const Matrix3x3<Scalar>& a);
-
-    template <typename Scalar> Matrix3x3<Scalar> cross(const Vector3<Scalar>& v);
+    template <typename Scalar> Vector3<Scalar> diagonal(const Matrix3x3<Scalar>& a);
+      
+    template <typename Scalar> Matrix3x3<Scalar> diag(const Vector3<Scalar>& v);
+    template <typename Scalar> Matrix3x3<Scalar> skew(const Vector3<Scalar>& v);
     template <typename Scalar> Matrix3x3<Scalar> dyad(const Vector3<Scalar>& v1, const Vector3<Scalar>& v2);
 
     template <typename Scalar> Matrix3x3<Scalar> cholesky(const Matrix3x3<Scalar> a);
@@ -700,11 +702,29 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Matrix3x3<Scalar> cross(const Vector3<Scalar>& v)
+    Vector3<Scalar> diagonal(const Matrix3x3<Scalar>& a)
     {
-        return Matrix3x3<Scalar>(Scalar(),    -v.z,     v.y, 
-                                 v.z,    Scalar(),    -v.x, 
-                                 -v.y,        v.x, Scalar());
+        return Vector3<Scalar>(a[0][0], a[1][1], a[2][2]);
+    }
+    
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Matrix3x3<Scalar> diag(const Vector3<Scalar>& v)
+    {
+        return Matrix3x3<Scalar>(v.x, Scalar(), Scalar(),
+                                 Scalar(), v.y, Scalar(),
+                                 Scalar(), Scalar(), v.z);
+    }
+
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Matrix3x3<Scalar> skew(const Vector3<Scalar>& v)
+    {
+        return Matrix3x3<Scalar>(Scalar(), -v.z, v.y,
+                                 v.z, Scalar(), -v.x,
+                                 -v.y, v.x, Scalar());
     }
 
     template <typename Scalar>
@@ -773,10 +793,6 @@ namespace mt
         v[2] = Scalar1(a[2][0]); v[6] = Scalar1(a[2][1]); v[10] = Scalar1(a[2][2]);  
     }
 
- 
-
-    
- 
 }
 
 #endif

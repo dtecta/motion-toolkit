@@ -35,6 +35,7 @@ namespace mt
     template <typename Scalar> std::complex<Scalar> euler(Scalar theta);
 
     template <typename Scalar> Vector4<Scalar> fromAxisAngle(const Vector3<Scalar>& axis, Scalar theta);
+    template <typename Scalar> Vector4<Scalar> fromAxisAngle(int axis, Scalar theta);
     template <typename Scalar> void toAxisAngle(Vector3<Scalar>& axis, Scalar& theta, const Vector4<Scalar>& u);
 
     template <typename Scalar> Vector4<Scalar> exp(const Vector3<Scalar>& v);
@@ -168,7 +169,18 @@ namespace mt
         return Vector4<Scalar>(axis * s, c.real());
     }
 
-	template <typename Scalar>
+    template <typename Scalar>
+    FORCEINLINE
+    Vector4<Scalar> fromAxisAngle(int axis, Scalar theta)
+    {
+        ASSERT(0 <= axis && axis < 3);
+        std::complex<Scalar> c = euler(theta * Scalar(0.5));
+        Vector4<Scalar> result(c.real());
+        result[axis] = c.imag();
+        return result;
+    }
+
+    template <typename Scalar>
     FORCEINLINE
     void toAxisAngle(Vector3<Scalar>& axis, Scalar& theta, const Vector4<Scalar>& u)
     {
@@ -207,7 +219,7 @@ namespace mt
     } 
     
 
-	template <typename Scalar>
+    template <typename Scalar>
     Vector4<Scalar> exp(const Vector4<Scalar>& q)
     {
         const Vector3<Scalar>& v = xyz(q); 
@@ -262,7 +274,7 @@ namespace mt
         Vector4<Scalar1> diff = mul(q1, conjugate(q0));
         return logUnit(diff) * (Scalar2(2) / h);
     }
-  
+    
     template <typename Scalar>
     Vector3<Scalar> dihedral(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2)
     {
@@ -291,22 +303,47 @@ namespace mt
         theta = !mt::iszero(u.y) || !mt::iszero(u.x) ? atan2(u.y, u.x) : Scalar();
     } 
 
-
     template <typename Scalar>
     FORCEINLINE
-    Vector4<Scalar> euler(Scalar theta, Scalar phi, Scalar rho)
+    Vector4<Scalar> fromSpherical(Scalar rho, Scalar phi, Scalar theta)
     {
-        return fromAxisAngle(euler(theta, phi), rho);  
+        std::complex<Scalar> c1 = euler(theta);
+        std::complex<Scalar> c2 = euler(phi);
+        Vector3<Scalar> axis(c1.real() * c2.imag(), c1.imag() * c2.imag(), c2.real());
+        return axisAngle(axis, rho);  
     }
 
     template <typename Scalar>
     FORCEINLINE
-    void toEuler(Scalar& theta, Scalar& phi, Scalar& rho, const Vector4<Scalar>& u)
+    void toSpherical(Scalar& rho, Scalar& phi, Scalar& theta, const Vector4<Scalar>& u)
     {
-        Vector3<Scalar> axis;
-        toAxisAngle(axis, rho, u);
-        toEuler(theta, phi, axis);
+        rho = acos(u.w) * Scalar(2);
+        Vector3<Scalar> axis = normalize(xyz(u));
+        phi = acos(axis.z);
+        theta = atan2(axis.y, axis.x);  
     }
+
+    template <typename Scalar>
+    FORCEINLINE
+    Vector4<Scalar> fromEuler(Scalar yaw, Scalar pitch, Scalar roll)
+    {
+        std::complex<Scalar> qyaw   = euler(yaw * Scalar(0.5));
+        std::complex<Scalar> qpitch = euler(pitch * Scalar(0.5));
+        std::complex<Scalar> qroll  = euler(roll * Scalar(0.5));
+        return mul(Vector4<Scalar>(Scalar(), qyaw.imag(), Scalar(), qyaw.real()),
+                   Vector4<Scalar>(qpitch.imag(), Scalar(), Scalar(), qpitch.real()),
+                   Vector4<Scalar>(Scalar(), Scalar(), qroll.imag(), qroll.real()));
+    }
+
+	template <typename Scalar>
+    FORCEINLINE
+    void toEuler(Scalar& yaw, Scalar& pitch, Scalar& roll, const Vector4<Scalar>& q)
+    {
+        yaw   = atan2(Scalar(2) * (q.w * q.y + q.z * q.x), Scalar(1) - Scalar(2) * (q.x * q.x + q.y * q.y));
+        pitch = asin(Scalar(2) * (q.w * q.x - q.y * q.z));
+        roll  = atan2(Scalar(2) * (q.w * q.z + q.x * q.y), Scalar(1) - Scalar(2) * (q.z * q.z + q.x * q.x));
+    }
+
 
 
 }

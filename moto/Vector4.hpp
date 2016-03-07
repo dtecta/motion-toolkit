@@ -182,7 +182,13 @@ namespace mt
     template <typename Scalar> Vector4<Scalar> align(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2);
     
  
+    template <typename Scalar> void decomposeX(const Vector4<Scalar>& q, Vector4<Scalar>& qyz, Vector4<Scalar>& qx);
+    template <typename Scalar> void decomposeY(const Vector4<Scalar>& q, Vector4<Scalar>& qxz, Vector4<Scalar>& qy);
     template <typename Scalar> void decomposeZ(const Vector4<Scalar>& q, Vector4<Scalar>& qxy, Vector4<Scalar>& qz);
+   
+    template <typename Scalar> void decomposePreX(const Vector4<Scalar>& q, Vector4<Scalar>& qx, Vector4<Scalar>& qyz);
+    template <typename Scalar> void decomposePreY(const Vector4<Scalar>& q, Vector4<Scalar>& qy, Vector4<Scalar>& qxz);
+    template <typename Scalar> void decomposePreZ(const Vector4<Scalar>& q, Vector4<Scalar>& qz, Vector4<Scalar>& qxy);
 
     template <typename Scalar> bool isfinite(const Vector4<Scalar>& a);
 
@@ -835,6 +841,23 @@ namespace mt
                              Scalar(), 
                              Scalar(), 
                              q.w * r); 
+    }
+
+    template <typename Scalar> 
+    FORCEINLINE
+    void decomposePreX(const Vector4<Scalar>& q, Vector4<Scalar>& qx, Vector4<Scalar>& qyz)
+    {
+        Scalar r = rsqrt(q.x * q.x + q.w * q.w);
+       
+         qx = Vector4<Scalar>(q.x * r,
+                             Scalar(), 
+                             Scalar(), 
+                             q.w * r); 
+         qyz = Vector4<Scalar>(Scalar(),
+                              (q.w * q.y + q.x * q.z) * r, 
+                              (q.w * q.z - q.x * q.y) * r, 
+                              Scalar(1) / r);
+       
     } 
 
     template <typename Scalar> 
@@ -853,6 +876,25 @@ namespace mt
                              q.w * r); 
     }
 
+
+    template <typename Scalar> 
+    FORCEINLINE
+    void decomposePreY(const Vector4<Scalar>& q, Vector4<Scalar>& qy, Vector4<Scalar>& qxz)
+    {
+        Scalar r = rsqrt(q.y * q.y + q.w * q.w);
+
+        qy = Vector4<Scalar>(Scalar(),
+                             q.y * r,
+                             Scalar(),  
+                             q.w * r);
+       
+        qxz = Vector4<Scalar>((q.w * q.x - q.y * q.z) * r,
+                              Scalar(), 
+                              (q.w * q.z + q.y * q.x) * r, 
+                              Scalar(1) / r);
+     
+    }
+
     template <typename Scalar> 
     FORCEINLINE
     void decomposeZ(const Vector4<Scalar>& q, Vector4<Scalar>& qxy, Vector4<Scalar>& qz)
@@ -867,6 +909,23 @@ namespace mt
                              Scalar(), 
                              q.z * r, 
                              q.w * r); 
+    }
+
+    template <typename Scalar>
+    FORCEINLINE
+    void decomposePreZ(const Vector4<Scalar>& q, Vector4<Scalar>& qz, Vector4<Scalar>& qxy)
+    {
+        Scalar r = rsqrt(q.z * q.z + q.w * q.w);
+
+        qz = Vector4<Scalar>(Scalar(),
+                             Scalar(), 
+                             q.z * r, 
+                             q.w * r); 
+       
+        qxy = Vector4<Scalar>((q.w * q.x + q.z * q.y) * r, 
+                              (q.w * q.y - q.z * q.x) * r, 
+                              Scalar(), 
+                              Scalar(1) / r);
     }
 
     template <typename Scalar>

@@ -118,11 +118,21 @@ namespace mt
 
         Vector3<float> operator()(const Vector3<float>& v) const;
         
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4201)
+#endif
+
         union 
         {
             struct { float x, y, z, w; };
             __m128 vec; 
         };
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
     };   
 
 

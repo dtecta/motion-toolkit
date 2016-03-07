@@ -1,3 +1,5 @@
+
+
 add_executable(moto
   Algebra.hpp
   BBox3.hpp
@@ -30,9 +32,10 @@ add_executable(moto
   UnitTest.cpp
 )
 
-add_dependencies(moto consolid) 
+set(MOTO_DEPS consolid gtest)
+add_dependencies(${MOTO_DEPS}) 
 set_target_properties(moto PROPERTIES DEBUG_POSTFIX _d)
-target_link_libraries(moto consolid)
+target_link_libraries(moto ${MOTO_DEPS})
 if(UNIX)
 target_link_libraries(moto pthread)
 endif()

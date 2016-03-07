@@ -96,7 +96,10 @@ namespace mt
     
     template <typename Scalar1, typename Scalar2>
     typename Promote<Scalar1, Scalar2>::RT dot(const Vector2<Scalar1>& a, const Vector2<Scalar2>& b); 
-  
+    
+    template <typename Scalar1, typename Scalar2>
+    typename Promote<Scalar1, Scalar2>::RT perpdot(const Vector2<Scalar1>& a, const Vector2<Scalar2>& b); 
+    
     template <typename Scalar> Vector2<Scalar> abs(const Vector2<Scalar>& a);
     template <typename Scalar> Vector2<Scalar> perp(const Vector2<Scalar>& a);
     
@@ -384,7 +387,15 @@ namespace mt
         return a.x * b.x + a.y * b.y;
     }
  
-    template <typename Scalar>
+    template <typename Scalar1, typename Scalar2>
+    FORCEINLINE 
+    typename Promote<Scalar1, Scalar2>::RT 
+    perpdot(const Vector2<Scalar1>& a, const Vector2<Scalar2>& b)
+    {
+        return -a.y * b.x + a.x * b.y;
+    }
+ 
+     template <typename Scalar>
     FORCEINLINE
     Vector2<Scalar> abs(const Vector2<Scalar>& a)
     {

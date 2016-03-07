@@ -31,7 +31,7 @@ namespace guts
  
     private:
         static const size_t NO_REF = size_t(~0);   
-        static const size_t PARENT_REF = 1 << 31;      
+        static const size_t PARENT_REF = size_t(1 << 31);      
 
         struct Node
         {

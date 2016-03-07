@@ -26,6 +26,7 @@ namespace mt
   
     template <typename Scalar> Vector4<Dual<Scalar> > conj(const Vector4<Dual<Scalar> >& q);
 
+    template <typename Scalar> Vector3<Scalar> rigidTransform(const Vector4<Dual<Scalar> >& q, const Vector3<Scalar>& p);
 
 
     // A dual quaternion representing a rigid transformation with rotation q and translation t
@@ -75,6 +76,17 @@ namespace mt
         return Vector4<Dual<Scalar> >(conj(q.x), conj(q.y), conj(q.z), conj(q.w));
     }  
     
+
+    template <typename Scalar> 
+    FORCEINLINE    
+    Vector3<Scalar> rigidTransform(const Vector4<Dual<Scalar> >& q, const Vector3<Scalar>& p)
+    {
+        // Which is faster?
+        return rotation(q)(p) + translation(q); 
+        // return xyz(dual(mul(mul(q, makeDual(Vector4<Scalar>(Identity()), Vector4<Scalar>(p))), conj(conjugate(q)))));
+    } 
+
+
 
     template <typename Scalar> 
     FORCEINLINE    

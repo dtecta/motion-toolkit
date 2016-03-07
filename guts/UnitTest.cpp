@@ -6,51 +6,66 @@
     http://opensource.org/licenses/MIT
 */
 
+#include "Vector.hpp"
+#include "Set.hpp"
 #include "HashTable.hpp"
 #include "BinomialQueue.hpp"
 
+#include "String.hpp"
+
 #include <iostream>
-#include <guts/Set.hpp>
-#include <guts/String.hpp>
+#include <gtest/gtest.h>
 
-typedef guts::BinomialQueue<int> Queue_t;
 
-void testQueue()
+TEST(Generic, BinomialQueue)
 {
-    Queue_t queue;
+    typedef guts::BinomialQueue<int> Queue;
+    typedef guts::Vector<int>::RT ValueList; 
+
+    ValueList values;
+    
+    Queue queue;
 
     for (int i = 0; i != 100; ++i)
     {
 
         int x = rand() % 97; 
-        
-        std::cout << x << ' ';
 
         queue.push(x);
+        values.push_back(x);
     }
 
     queue.decrease_key(0, 0);
+    values.front() = 0;
 
-    std::cout << std::endl;
+    queue.destroy(42);
+    values.erase(values.begin() + 42);
+
+    std::sort(values.begin(), values.end());
+
+    ValueList::const_iterator it = values.begin();
 
     while (!queue.empty())
     {
         int x = queue.pop();
-
-        std::cout << x << ' ';
+        EXPECT_EQ(x, *it);
+        ++it;
     }
 }
 
-typedef guts::HashTable<guts::String> HashTable;
 
-
-static const int NUM_ITER = 1000;
-static const int INT_RANGE = 100000;
-
-static guts::String names[INT_RANGE]; 
-
-void initNames()
+TEST(Generic, HashTable)
 {
+
+    typedef guts::HashTable<guts::String> HashTable;
+    typedef guts::Set<guts::String>::RT Set;
+
+    static const int NUM_ITER = 100;
+    static const int INT_RANGE = 100000;
+
+    static guts::String names[INT_RANGE];
+
+    //initialize names
     for (int i = 0; i != INT_RANGE; ++i)
     {
         int length = rand() % 32;
@@ -60,17 +75,10 @@ void initNames()
             names[i][j] = 'A' + (rand() % 26);
         }
     }
-}
 
 
-unsigned int hash(int x)
-{
-    return x;
-}
-
-void testHashTable()
-{
     HashTable hashTable(10000);
+    Set set;
 
     for (int i = 0; i != NUM_ITER; ++i)
     {
@@ -78,61 +86,40 @@ void testHashTable()
         
         if (hashTable.retrieve(x) == 0)
         {
-            //std::cout << x << ' ';
+            EXPECT_TRUE(set.find(x) == set.end());
             hashTable.insert(x);
+            set.insert(x);
+        }
+        else
+        {
+            EXPECT_TRUE(set.find(x) != set.end());
         }
     }
-
-    //std::cout << std::endl;
 
     while (!hashTable.empty())
     {
+        EXPECT_TRUE(!set.empty());
+
         guts::String x = names[rand() % INT_RANGE];
         if (hashTable.retrieve(x) != 0)
         {
+            Set::iterator it = set.find(x);
+            EXPECT_TRUE(it != set.end());
             hashTable.remove(x);
-            //std::cout << x << ' ';
+            set.erase(it);
+        }
+        else
+        {
+            EXPECT_TRUE(set.find(x) == set.end());
         }
     }
 }
 
 
-void testSet()
+GTEST_API_ int main(int argc, char **argv) 
 {
-    guts::Set<guts::String>::RT set;
+    testing::InitGoogleTest(&argc, argv);
 
-    for (int i = 0; i != NUM_ITER; ++i)
-    {
-        guts::String x = names[rand() % INT_RANGE]; 
-        
-        if (set.find(x) == set.end())
-        {
-            //std::cout << x << ' ';
-            set.insert(x);
-        }
-    }
-
-    //std::cout << std::endl;
-
-    while (!set.empty())
-    {
-        guts::String x = names[rand() % INT_RANGE];
-        if (set.find(x) != set.end())
-        {
-            set.erase(x);
-            //std::cout << x << ' ';
-        }
-    }
-}
-
-int main()
-{
-    initNames();
-    //testQueue();
-    for (int k = 0; k != 100; ++k)
-    {
-        testHashTable();
-    }
-    //testSet();  
-  return 0;
+    int result = RUN_ALL_TESTS();
+    return result;
 }

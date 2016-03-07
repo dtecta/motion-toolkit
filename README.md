@@ -1,5 +1,6 @@
 
 		 MoTo - Motion Toolkit
+		 =====================
 
 MoTo is a software library written in C++ and contains class and
 function templates that are useful for animation and simulation of
@@ -73,10 +74,15 @@ for details.
 Sample code on how to make use of mt::Dual and other classes can be found in
 UnitTest.cpp
 
- 
+
+Th directory 'jointlimits' holds the sample code accompanying Chapter 10
+"Rotational Joint Limits in Quaternion Space" of "Game Engine Gems 3".
+Please, refer to the source code and chapter for details. Documentation for
+the jointlimits can be generated using Doxygen + graphpviz.
 
 
 Installation
+------------
 
 MoTo itself can be readily used. For building consolid and the UnitTest.cpp
 sample you need CMake 2.4 or up. Please, check the CMake documentation on how
@@ -84,6 +90,7 @@ to generate a MSVC project or makefiles for GCC.
 
 
 Platforms
+---------
 
 MoTo has been tested on the following platforms:
 

@@ -7,6 +7,7 @@
 */
 
 #include <iostream>
+#include <gtest/gtest.h>
 
 #define USE_OSTREAM 1
 
@@ -73,23 +74,48 @@ T smoothstepprime(T x)
 
 
 template <typename Vector>
-bool fuzzyEqual(const Vector& lhs, const Vector& rhs)
+void testFuzzyEqual(const Vector& lhs, const Vector& rhs)
 {
-    return lengthSquared(lhs - rhs) < ScalarTraits::epsilon();
+    EXPECT_LE(lengthSquared(lhs - rhs), ScalarTraits::epsilon());
 }
 
-bool fuzzyEqual(const DualQuaternion& lhs, const DualQuaternion& rhs)
+void testFuzzyEqual(const DualQuaternion& lhs, const DualQuaternion& rhs)
 {
-    return fuzzyEqual(real(lhs), real(rhs)) && fuzzyEqual(dual(lhs), dual(rhs));
+    testFuzzyEqual(real(lhs), real(rhs));
+    testFuzzyEqual(dual(lhs), dual(rhs));
 }
 
-bool fuzzyEqual(const DualVector3& lhs, const DualVector3& rhs)
+void testFuzzyEqual(const DualVector3& lhs, const DualVector3& rhs)
 {
-    return fuzzyEqual(real(lhs), real(rhs)) && fuzzyEqual(dual(lhs), dual(rhs));
+    testFuzzyEqual(real(lhs), real(rhs));
+    testFuzzyEqual(dual(lhs), dual(rhs));
 }
 
-int main()
-{  
+TEST(Trigonometry, EulerAngles)
+{
+    Random random;
+
+    for (int k = 0; k != 1000; ++k)
+    {
+        Quaternion q = random.rotation();
+        if (mt::isnegative(q.w))
+        {
+            q = -q;
+        }
+        Scalar yaw, pitch, roll;
+        toEuler(yaw, pitch, roll, q);
+        Quaternion q1 = mt::fromEuler(yaw, pitch, roll);
+        if (mt::isnegative(q1.w))
+        {
+            q1 = -q1;
+        }
+        testFuzzyEqual(q, q1);
+    }
+
+}
+
+TEST(DualNumbers, AutomaticDifferentiation)
+{
     Dual z1; // zero initialized
     Dual z2(2); // zero dual part
     Dual z3(2, 1); // Both real and dual part initialized
@@ -105,7 +131,7 @@ int main()
         // and output the function values f(x) as follows.
         std::cout << "x = " << x << "\tf(x) = " << smoothstep(x) << std::endl;
     }
-    
+
     // Since smoothstep is a template we can compute the first-order derivative by calling it using a dual number. 
     for (int k = 0; k != 11; ++k)
     {
@@ -117,7 +143,7 @@ int main()
 
         // The function value f(x) is the real part and the value of the first-order derivative f'(x) is the dual part.
         std::cout << "x = " << x << "\tf(x) = " << real(y) << "\tf'(x) = " << dual(y) << std::endl;
-    } 
+    }
 
     // Let's represent the first-order derivative as a template function smoothstepprime.
     for (int k = 0; k != 11; ++k)
@@ -138,7 +164,7 @@ int main()
 
         // So, the dual part of the result is the second-order derivative f''(x).
         std::cout << "x = " << x << "\tf'(x) = " << real(y) << "\tf''(x) = " << dual(y) << std::endl;
-    }  
+    }
 
     // Or, we can compute function value, first-order derivative and second-order derivative in one go using a dual of duals.
     for (int k = 0; k != 11; ++k)
@@ -153,10 +179,11 @@ int main()
         // The value of the first-order derivative f'(x) is the real part of the dual part (or the dual part of the real part).
         // The value of the second-order derivative f''(x) is the dual part of the dual part.
         std::cout << "x = " << x << "\tf(x) = " << real(real(y)) << "\tf'(x) = " << real(dual(y)) << "\tf''(x) = " << dual(dual(y)) << std::endl;
-    } 
-   
-    // Dual numbers in line geometry and dual quaternions
+    }
+}
 
+TEST(DualNumbers, PlueckerCoordinates)
+{
     // PLUECKER COORDINATES
 
     Random random;
@@ -194,12 +221,10 @@ int main()
 
     // Compute the angle between lines. The angle is acos(linedot) / sqrt(dot(linep1q1, linep1q1) * dot(linep2q2, linep2q2))
     // NB: the sign of the signed distance is opposite to the sign of dual(linedot). 
-    Dual dualangle = angle(linep1q1, linep2q2);  
+    Dual dualangle = angle(linep1q1, linep2q2);
 
     std::cout << "The angle between line1 and line2 is " << mt::degrees(real(dualangle)) << " degrees," << std::endl;
     std::cout << "and the signed distance is " << dual(dualangle) << std::endl;
-
-
     // RIGID BODY TRANSFORMATIONS
 
     // Generate a random orientation. This quaternion is used for constructing a random rigid body transformation
@@ -219,16 +244,15 @@ int main()
     DualVector3 tlinepq = makeLine(tp1, tq1);
 
     // We can also transform the line directly through a dual 3x3 matrix
-    DualMatrix3x3 xform = makeDual(basis, mul(cross(origin), basis));
+    DualMatrix3x3 xform = makeDual(basis, mul(skew(origin), basis));
 
     // The transformation is performed by 
     DualVector3 tlinepq2 = mul(xform, linep1q1);
 
     // tlinepq and tlinepg2 should be equal give or take a few rounding differences      
-    ASSERT(fuzzyEqual(tlinepq, tlinepq2));
+    testFuzzyEqual(tlinepq, tlinepq2);
 
-
-    // DUAL QUATERNIONS
+    // DUAL QUATERNIONS  
 
     // The dual quaternion that performs the same rigid body transformation is 
     DualQuaternion dq = rigid(orn, origin);
@@ -236,22 +260,21 @@ int main()
     // Rotation and translation can be retrieved from a dual quaternion.
 
     Quaternion orn1 = rotation(dq);
-    ASSERT(fuzzyEqual(orn, orn1));
+    testFuzzyEqual(orn, orn1);
 
     Vector3 origin1 = translation(dq);
-    ASSERT(fuzzyEqual(origin, origin1));
-    
+    testFuzzyEqual(origin, origin1);
 
     // The function operator on (dual) quaternions performs the transformation: dq(x) = mul(dq, mul(x, conjugate(dq)))
     DualVector3 tlinepq3 = dq(linep1q1);
 
-    ASSERT(fuzzyEqual(tlinepq, tlinepq3));
+    testFuzzyEqual(tlinepq, tlinepq3);
 
     // Dual quaternions can be normalized, however, dq already has unit length
     DualQuaternion ndq = normalize(dq);
 
     DualQuaternion u = mul(dq, inverse(dq));
-    DualQuaternion n = mul(dq, conjugate(dq)); 
+    DualQuaternion n = mul(dq, conjugate(dq));
     DualQuaternion nn = mul(ndq, conjugate(ndq));
 
     std::cout << "u = " << u << std::endl << "n = " << n << std::endl << "nn = " << nn << std::endl;
@@ -274,7 +297,7 @@ int main()
     if (mt::isnegative(dot(dq, dq2)))
     {
         dq2 = -dq2; // dq2 and -dq2 are the same pose, but -dq2 is closer to dq than dq2 is.
-    } 
+    }
 
     // Method #1: normalized lerp: normalize(lerp(dq, dq2, t)). 
     //            This one is commonly used in dual quaternion skinning since it is the simplest and is applicable to more than two poses.
@@ -286,15 +309,29 @@ int main()
     // Method #2: spherical lerp. 
     //            This one interpolates with 'constant velocity' but only works between two poses. 
 
-    DualQuaternion method2 = slerp(dq, dq2, t); 
+    DualQuaternion method2 = slerp(dq, dq2, t);
 
     // Method #3: exponential of the lerp of the logarithms: exp(lerp(logUnit(dq), logUnit(dq2), t)). 
     //             This one is applicable to more than two poses, has 'constant velocity' as well, but does not necessarily follow the shortest path
 
     DualQuaternion method3 = logLerpUnit(dq, dq2, t);
+}
 
-
+TEST(DualNumbers, ScrewMotion)
+{
     // SCREWS
+
+    Random random;
+
+    // Generate a random orientation. This quaternion is used for constructing a random rigid body transformation
+    Quaternion orn = random.rotation();
+
+    // The coordinate system is placed at an origin inside the same cube of size 20
+    Vector3 origin = random.uniformVector3(-10, 10);
+
+    // The dual quaternion that performs the same rigid body transformation is 
+    DualQuaternion dq = rigid(orn, origin);
+
 
     // Dual quaternions represent screw motions
     Dual screwangle = acos(dq.w);
@@ -305,10 +342,14 @@ int main()
 
     std::cout << "and axis is " << axis << std::endl;
 
+    // We have a random point inside a cube of size 20
+    Vector3 p = random.uniformVector3(-10, 10);
 
+    // Given a quaternion orn and point origin, we can transform point p by 
+    Vector3 tp = orn(p) + origin;
 
     // A point can be transformed directly by a dual quaternion. First create a dual quaternion from the point. 
-    DualQuaternion dqp = makeDual(Quaternion(Identity()), Quaternion(p1, Scalar()));
+    DualQuaternion dqp = makeDual(Quaternion(Identity()), Quaternion(p, Scalar()));
 
     // Transform dqp using both the dual and quaternion conjugate, respectively denoted by "conj" and "conjugate".
     DualQuaternion tdqp = mul(dq, mul(dqp, conj(conjugate(dq))));
@@ -317,39 +358,59 @@ int main()
     Vector3 tdp = xyz(dual(tdqp));
 
     // which is equal to tp1 as verified below.
-    ASSERT(fuzzyEqual(tp1, tdp));
+    testFuzzyEqual(tp, tdp);
+}
 
-   
+TEST(DualNumbers, VelocityIntegration)
+{
+    // Angular and linear velocity is combined into Pluecker coordinates (dual vectors) as a twist.
+    Vector3 angVel = Vector3(0, 0, -1);
+    Vector3 linVel = Vector3(1, 0, 0);
 
-    DualVector3 localvel = makeDual(Vector3(0, 0, -1), Vector3(1, 0, 0));
-    DualQuaternion pose = rigid(Quaternion(Identity()), Vector3(0, 1, 0));
-    
-    Scalar step = Scalar(0.01);
+    DualVector3 localTwist = makeDual(angVel, linVel);
+
+    // Intialize pose1 and pose2 
+    DualQuaternion pose1 = rigid(Quaternion(Identity()), Vector3(0, 1, 0));
+    DualQuaternion pose2 = pose1;
+
+    static const Scalar step = Scalar(0.01);
     for (int k = 0; k != 100; ++k)
     {
-        Dual angle = acos(pose.w) * Dual(2);
+        Dual angle = acos(pose1.w) * Dual(2);
 
-        std::cout << "Pose: " << pose << "Orientation: " << rotation(pose) << "\tPosition: " << translation(pose) << "\tAngle: " << angle << std::endl;
+        std::cout << "Pose: " << pose1 << "Orientation: " << rotation(pose1) << "\tPosition: " << translation(pose1) << "\tAngle: " << angle << std::endl;
 
-        DualVector3 worldvel = pose(localvel);
-        DualQuaternion dPose = mul(worldvel, pose) * (step * Scalar(0.5));
-        pose = normalize(pose + dPose);
-      
+        // There are two ways to integrate a twist. The first and best known method uses the twist in world space.
+        DualVector3 worldTwist = pose1(localTwist);
+        pose1 = normalize(pose1 + mul(worldTwist, pose1) * (step * Scalar(0.5)));
+
+        // There is also a method that uses the twist in local space.
+        pose2 = normalize(mul(pose2, DualQuaternion(localTwist * (step * Scalar(0.5)), 1)));
+
+        // Both methods are pretty much equivalent
+        testFuzzyEqual(pose1, pose2);
     }
+}
 
+TEST(DualNumbers, DualQuaternionLogarithm)
+{
     Scalar theta = 1;
     for (int k = 0; k != 12; ++k)
     {
-        DualQuaternion dqt = rigid(fromAxisAngle(Vector3(0, 1, 0), theta), Vector3(0, 0, 1));
-        DualVector3 logdqt = logUnit(dqt); 
+        DualQuaternion dqt = rigid(mt::fromAxisAngle(1, theta), Vector3(0, 0, 1));
+        DualVector3 logdqt = logUnit(dqt);
         DualQuaternion dqt2 = exp(logdqt);
 
-        ASSERT(fuzzyEqual(dqt, dqt2));
+        testFuzzyEqual(dqt, dqt2);
 
         theta *= Scalar(0.5);
     }
+}
 
-    getchar();
-    
-    return 0;
+GTEST_API_ int main(int argc, char **argv) 
+{
+    testing::InitGoogleTest(&argc, argv);
+
+    int result = RUN_ALL_TESTS();
+    return result;
 }

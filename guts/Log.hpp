@@ -15,24 +15,17 @@
 
 #include <guts/Singleton.hpp>
 
+#define SCOPED_FUNCTION_LOG guts::ScopedFunctionLog guard(__FUNCTION__);
+
+
 namespace guts
 {  
-    class OutputStream
-    {
-    public:
-        virtual ~OutputStream() {}
-        virtual void write(const char*) = 0;
-    };
+	typedef void (*LogCallback)(void* clientData, int level, const char* format, va_list args);
 
     class Log
         : public guts::Singleton<Log>
     {
-    public:  
-        Log() 
-            : mOutputStream(0)
-            , mSeverityLevel(INFO)
-        {}
-
+    public:
         enum Severity
         {
             DEBUG = 0,
@@ -40,37 +33,57 @@ namespace guts
             WARNING, 
             FATAL
         };
-        
-        enum { MAXSIZE = 1024 };
 
+        Log() 
+            : mCallback(0)
+            , mClientData(0)
+			, mSeverityLevel(0)
+        {}
 
-        void notify(Severity severity, const char* format, ...)
+        void notify(int level, const char* format, ...)
         {
-            if (mOutputStream != 0 && severity >= mSeverityLevel)
+            if (mCallback != 0 && level >= mSeverityLevel)
             {
-                char buffer[MAXSIZE];	
-        
-                va_list args;	
-                va_start(args, format);	
-                vsnprintf(buffer, MAXSIZE, format, args);
-                mOutputStream->write(buffer);
+                va_list args;
+                va_start(args, format);
+                (*mCallback)(mClientData, level, format, args);
                 va_end(args);	
             }
         }
 
-        void setOutputStream(OutputStream* outputStream) 
+        void setCallback(LogCallback callback, void* clientData) 
         { 
-            mOutputStream = outputStream; 
+            mCallback = callback; 
+            mClientData = clientData;
         }
         
-        void setSeverityLevel(Severity severityLevel) 
+        void setSeverityLevel(int severityLevel) 
         { 
             mSeverityLevel = severityLevel; 
         }
 
     private:
-        OutputStream* mOutputStream;
-        Severity mSeverityLevel;
+        LogCallback mCallback;
+        void* mClientData;
+        int mSeverityLevel;
+    };
+
+    class ScopedFunctionLog
+    {
+    public:
+        ScopedFunctionLog(const char* function)
+            : mFunction(function)
+        {
+            Log::instance().notify(Log::DEBUG, "Entering %s\n", function);
+        }
+
+        ~ScopedFunctionLog()
+        {
+            Log::instance().notify(Log::DEBUG, "Exiting %s\n", mFunction);
+        }
+
+    private:
+        const char* mFunction;
     };
 }
 

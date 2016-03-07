@@ -72,8 +72,10 @@ namespace mt
 
     template <typename Element> const Element& mul(const Element& e, Identity);
     template <typename Element> const Element& mul(Identity, const Element& e);
-    
- 
+
+
+    template <typename Element> Element mul(const Element& a, const Element& b, const Element& c);
+
     Zero     dot(Zero, Zero);
     
     template <typename Vector> Zero dot(Zero, const Vector& v);
@@ -279,6 +281,13 @@ namespace mt
     { 
         return e;
     }   
+    
+    template <typename Element>
+    FORCEINLINE
+    Element mul(const Element& a, const Element& b, const Element& c)
+    {
+        return mul(mul(a, b), c);
+    }
 
     FORCEINLINE 
     Zero dot(Zero, Zero)

@@ -46,6 +46,8 @@ namespace mt
     
     template <typename Scalar> Scalar lower(const Interval<Scalar>& z); 
     template <typename Scalar> Scalar upper(const Interval<Scalar>& z);    
+    template <typename Scalar> Scalar width(const Interval<Scalar>& z);
+    template <typename Scalar> Scalar median(const Interval<Scalar>& z);
     
 #ifdef USE_OSTREAM
 
@@ -70,8 +72,7 @@ namespace mt
     template <typename Scalar1, typename Scalar2>
     Interval<typename Promote<Scalar1, Scalar2>::RT> operator-(const Interval<Scalar1>& z1, const Interval<Scalar2>& z2);
        
-    template <typename Scalar> Scalar width(const Interval<Scalar>& z);
-    template <typename Scalar> Scalar median(const Interval<Scalar>& z);
+    
    
     template <typename Scalar1, typename Scalar2> bool overlap(const Interval<Scalar1>& z1, const Interval<Scalar2>& z2);
     template <typename Scalar1, typename Scalar2> bool subset(const Interval<Scalar1>& z1, const Interval<Scalar2>& z2);
@@ -82,6 +83,7 @@ namespace mt
     template <typename Scalar> Interval<Scalar> hull(Scalar x, const Interval<Scalar>& z);
     template <typename Scalar> Interval<Scalar> hull(const Interval<Scalar>& z1, const Interval<Scalar>& z2);
     
+    template <typename Scalar> Scalar           clamp(Scalar x, const Interval<Scalar>& z);
     template <typename Scalar> Interval<Scalar> clamp(const Interval<Scalar>& z1, const Interval<Scalar>& z2);
     
 
@@ -221,7 +223,22 @@ namespace mt
     {   
         return z.upper();
     }   
-    
+        
+    template <typename Scalar>
+    FORCEINLINE 
+    Scalar width(const Interval<Scalar>& z)
+    {
+        return z.upper() - z.lower();
+    }
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Scalar median(const Interval<Scalar>& z)
+    {
+        return (z.lower() + z.upper()) * Scalar(0.5);
+    } 
+
+
 #ifdef USE_OSTREAM
 
     template <typename CharT, typename Traits, typename Scalar> 
@@ -300,20 +317,6 @@ namespace mt
         return Interval<RT>(z1.lower() - z2.upper(), z1.upper() - z2.lower());
     }
 
-    template <typename Scalar>
-    FORCEINLINE 
-    Scalar width(const Interval<Scalar>& z)
-    {
-        return z.upper() - z.lower();
-    }
-
-    template <typename Scalar>
-    FORCEINLINE 
-    Scalar median(const Interval<Scalar>& z)
-    {
-        return (z.lower() + z.upper()) * Scalar(0.5);
-    } 
-
     template <typename Scalar1, typename Scalar2>
     FORCEINLINE 
     bool overlap(const Interval<Scalar1>& z1, const Interval<Scalar2>& z2)
@@ -362,7 +365,16 @@ namespace mt
     {
         return Interval<Scalar>(min(z1.lower(), z2.lower()), max(z1.upper(), z2.upper()));
     }  
-    
+     
+    template <typename Scalar>
+    FORCEINLINE 
+    Scalar clamp(Scalar x, const Interval<Scalar>& z2)
+    {
+        return x < z2.lower() ? z2.lower() :
+               z2.upper() < x ? z2.upper() :
+               x;
+    }  
+
     template <typename Scalar>
     FORCEINLINE 
     Interval<Scalar> clamp(const Interval<Scalar>& z1, const Interval<Scalar>& z2)

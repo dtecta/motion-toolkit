@@ -35,7 +35,7 @@ namespace mt
     template <typename Scalar> Vector3<Scalar> closest(const Vector3<Dual<Scalar> >& v);
     template <typename Scalar> Scalar pitch(const Vector3<Dual<Scalar> >& v);
 
-    template <typename Scalar> Vector3<Scalar> linvel(const Vector3<Dual<Scalar> >& v, const Vector3<Scalar>& p);
+    template <typename Scalar> Vector3<Scalar> moment(const Vector3<Dual<Scalar> >& v, const Vector3<Scalar>& p);
 
 #ifdef USE_OSTREAM
     template <typename CharT, typename Traits, typename Scalar> 
@@ -104,7 +104,7 @@ namespace mt
     }   
 
     template <typename Scalar> 
-    Vector3<Scalar> linvel(const Vector3<Dual<Scalar> >& v, const Vector3<Scalar>& p)
+    Vector3<Scalar> moment(const Vector3<Dual<Scalar> >& v, const Vector3<Scalar>& p)
     {
         return dual(v) + cross(real(v), p); 
     }

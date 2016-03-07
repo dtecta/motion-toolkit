@@ -51,7 +51,7 @@ namespace mt
     FORCEINLINE
     Matrix3x3<Dual<Scalar> > lineTransform(const Matrix3x3<Scalar>& basis, const Vector3<Scalar>& origin)
     {   
-        return makeDual(basis, mul(cross(origin), basis));
+        return makeDual(basis, mul(skew(origin), basis));
     }  
 }
 
