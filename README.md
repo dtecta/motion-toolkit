@@ -1,5 +1,5 @@
 
-		#  MoTo - Motion Toolkit
+#  MoTo - Motion Toolkit
 
 MoTo is a software library written in C++ and contains class and
 function templates that are useful for animation and simulation of
