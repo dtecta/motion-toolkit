@@ -33,7 +33,7 @@ namespace guts
         typedef typename std::basic_string<Char, Traits, Allocator>::size_type size_type;
 
         size_type found = path.find_last_of("/\\");
-        return found != std::basic_string<Char, Traits, Allocator>::npos ? path.substr(0, found+1) : path;
+        return found != std::basic_string<Char, Traits, Allocator>::npos ? path.substr(0, found+1) : "";
     }
 
     template <typename Char, typename Traits, typename Allocator>
