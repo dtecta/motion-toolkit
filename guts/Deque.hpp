@@ -19,6 +19,11 @@ namespace guts
     {
         typedef std::deque<T, Allocator<T> > RT;
     };
+
+#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+	template <typename T>
+	using deque = std::deque<T, Allocator<T>>;
+#endif
 } 
 
 #endif

@@ -14,17 +14,27 @@
 
 namespace guts
 {
-    template <typename Key>
+    template <typename Key, typename Compare = std::less<Key>>
     struct Set
     {
-        typedef std::set<Key, std::less<Key>, guts::Allocator<Key> > RT;
+        typedef std::set<Key, Compare, Allocator<Key> > RT;
     };
     
-    template <typename Key>
+    template <typename Key, typename Compare = std::less<Key>>
     struct Multiset
     {
-        typedef std::multiset<Key, std::less<Key>, guts::Allocator<Key> > RT;
+        typedef std::multiset<Key, Compare, Allocator<Key> > RT;
     };
+	
+#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+	
+	template <typename Key, typename Compare = std::less<Key>>
+	using set = std::set<Key, Compare, Allocator<Key>>;
+
+	template <typename Key, typename Compare = std::less<Key>>
+	using multiset = std::multiset<Key, Compare, Allocator<Key>>;
+
+#endif
 }
 
 #endif

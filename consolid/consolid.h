@@ -138,7 +138,7 @@ int      tlsFree(uint32_t);
 int      tlsSetValue(uint32_t, void*);
 void*    tlsGetValue(uint32_t);
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 
 int      snprintf(char* str, size_t size, const char* format, ...);
 

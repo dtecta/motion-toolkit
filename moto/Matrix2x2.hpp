@@ -102,8 +102,8 @@ namespace mt
 
     
     template <typename Scalar> Matrix2x2<Scalar> mul(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b);
-    template <typename Scalar> Matrix2x2<Scalar> tmul(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b);
-    template <typename Scalar> Matrix2x2<Scalar> mult(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b);
+    template <typename Scalar> Matrix2x2<Scalar> transposeMul(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b);
+    template <typename Scalar> Matrix2x2<Scalar> mulTranspose(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b);
 
     template <typename Scalar> Vector2<Scalar> mul(const Matrix2x2<Scalar>& a, const Vector2<Scalar>& v);
     template <typename Scalar> Vector2<Scalar> mul(const Vector2<Scalar>& v, const Matrix2x2<Scalar>& a);
@@ -450,7 +450,7 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Matrix2x2<Scalar> tmul(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b)
+    Matrix2x2<Scalar> transposeMul(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b)
     {
         return Matrix2x2<Scalar>(a[0][0] * b[0][0] + a[1][0] * b[1][0], a[0][0] * b[0][1] + a[1][0] * b[1][1],
                                  a[0][1] * b[0][0] + a[1][1] * b[1][0], a[0][1] * b[0][1] + a[1][1] * b[1][1]);
@@ -458,7 +458,7 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
-    Matrix2x2<Scalar> mult(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b)
+    Matrix2x2<Scalar> mulTranspose(const Matrix2x2<Scalar>& a, const Matrix2x2<Scalar>& b)
     {
         return Matrix2x2<Scalar>(dot(a[0], b[0]), dot(a[0], b[1]),
                                  dot(a[1], b[0]), dot(a[1], b[1]));

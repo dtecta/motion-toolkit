@@ -30,7 +30,7 @@ namespace guts
         virtual const char* what() const throw() { return mMessage; }
  
     private:
-        enum { NCHARS = 256 };
+        enum { NCHARS = 2048 };
         char mMessage[NCHARS];          
     };
 }

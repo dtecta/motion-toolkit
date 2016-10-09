@@ -17,14 +17,25 @@ namespace guts
     template <typename Key, typename Data, typename Compare = std::less<Key> >
     struct Map
     {
-        typedef std::map<Key, Data, Compare, guts::Allocator<std::pair<const Key, Data> > > RT;
+        typedef std::map<Key, Data, Compare, Allocator<std::pair<const Key, Data> > > RT;
     };
     
     template <typename Key, typename Data, typename Compare = std::less<Key> >
     struct Multimap
     {
-        typedef std::multimap<Key, Data, Compare, guts::Allocator<std::pair<const Key, Data> > > RT;
+        typedef std::multimap<Key, Data, Compare, Allocator<std::pair<const Key, Data> > > RT;
     };
+
+#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+
+    template <typename Key, typename Data, typename Compare = std::less<Key>>
+    using map = std::map<Key, Data, Compare, Allocator<std::pair<const Key, Data>>>;
+ 
+    
+    template <typename Key, typename Data, typename Compare = std::less<Key>>
+    using multimap = std::multimap<Key, Data, Compare, Allocator<std::pair<const Key, Data>>>;
+ 
+#endif
 }
 
 #endif

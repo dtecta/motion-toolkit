@@ -6,7 +6,7 @@
     http://opensource.org/licenses/MIT
 */
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 
 #include "consolid.h"
 #include <stdarg.h>

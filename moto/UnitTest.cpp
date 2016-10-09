@@ -61,7 +61,7 @@ T smoothstep(T x)
 {  
     if (x < T())
         x = T();
-    else if (x > T(1))
+    else if (T(1) < x)
         x = T(1);
     return (T(3) - T(2) * x) * x * x;
 } 
@@ -90,6 +90,30 @@ void testFuzzyEqual(const DualVector3& lhs, const DualVector3& rhs)
     testFuzzyEqual(real(lhs), real(rhs));
     testFuzzyEqual(dual(lhs), dual(rhs));
 }
+
+TEST(Numerical, Traits)
+{
+    EXPECT_TRUE(mt::isnan(std::numeric_limits<float>::quiet_NaN()));
+    EXPECT_FALSE(mt::isnan(std::numeric_limits<float>::infinity()));
+
+    EXPECT_FALSE(mt::isinf(std::numeric_limits<float>::quiet_NaN()));
+    EXPECT_TRUE(mt::isinf(std::numeric_limits<float>::infinity()));
+
+    EXPECT_FALSE(mt::isfinite(std::numeric_limits<float>::quiet_NaN()));
+    EXPECT_FALSE(mt::isfinite(std::numeric_limits<float>::infinity()));
+    EXPECT_TRUE(mt::isfinite(std::numeric_limits<float>::max()));
+
+    EXPECT_TRUE(mt::isnan(std::numeric_limits<double>::quiet_NaN()));
+    EXPECT_FALSE(mt::isnan(std::numeric_limits<double>::infinity()));
+
+    EXPECT_FALSE(mt::isinf(std::numeric_limits<double>::quiet_NaN()));
+    EXPECT_TRUE(mt::isinf(std::numeric_limits<double>::infinity()));
+
+    EXPECT_FALSE(mt::isfinite(std::numeric_limits<double>::quiet_NaN()));
+    EXPECT_FALSE(mt::isfinite(std::numeric_limits<double>::infinity()));
+    EXPECT_TRUE(mt::isfinite(std::numeric_limits<double>::max()));
+}
+
 
 TEST(Trigonometry, EulerAngles)
 {

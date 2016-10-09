@@ -22,6 +22,9 @@
 #define CONSCIENCE_NAGGING 0
 #define APPROX_RECIPROCAL_SQRT 0
 
+// Can't use this in VC12 __cplusplus >= 201103L
+#define HAS_CPP11_SUPPORT 1
+
 namespace mt
 {  
     template <typename Scalar> Scalar acos(Scalar x);
@@ -29,19 +32,17 @@ namespace mt
 
     template <typename To, typename From> To bitcast(From from);
     
+#if !HAS_CPP11_SUPPORT
     template <typename Scalar> bool isnan(Scalar a); 
     template <typename Scalar> bool isinf(Scalar a); 
     template <typename Scalar> bool isfinite(Scalar a);  
+#endif
+
     template <typename Scalar> bool ispositive(Scalar a); 
     template <typename Scalar> bool isnegative(Scalar a);   
     template <typename Scalar> bool iszero(Scalar a);  
     template <typename Scalar> bool islessnn(Scalar a, Scalar b);
-   
-    template <typename Scalar> bool operator!=(Scalar a, Scalar b); 
-    template <typename Scalar> bool operator>(Scalar a, Scalar b);  
-    template <typename Scalar> bool operator<=(Scalar a, Scalar b); 
-    template <typename Scalar> bool operator>=(Scalar a, Scalar b); 
- 
+
     template <typename Scalar> Scalar min(Scalar a, Scalar b); 
     template <typename Scalar> Scalar max(Scalar a, Scalar b);
 
@@ -84,7 +85,12 @@ namespace mt
     using std::sqrt;   
     using std::tan;
     using std::tanh;
-    
+
+#if HAS_CPP11_SUPPORT
+    using std::isnan;
+    using std::isinf;
+    using std::isfinite;
+#endif
 
     template <typename Scalar>
     FORCEINLINE
@@ -119,6 +125,7 @@ namespace mt
 #endif
     }
  
+#if !HAS_CPP11_SUPPORT
     template <typename Scalar>
     FORCEINLINE
     bool isnan(Scalar a) 
@@ -139,6 +146,7 @@ namespace mt
     {
         return !isnan(a) && !isnan(a - a);
     }
+#endif
 
     template <typename Scalar>
     FORCEINLINE
@@ -185,36 +193,6 @@ namespace mt
         ASSERT(!signbit(a) && !signbit(b));
         return a < b;
     } 
-
-
-  
-    template <typename Scalar> 
-    FORCEINLINE 
-    bool operator!=(Scalar a, Scalar b)
-    {
-        return !(a == b);
-    }
-
-    template <typename Scalar> 
-    FORCEINLINE 
-    bool operator>(Scalar a, Scalar b)
-    {
-        return b < a;
-    }
-
-    template <typename Scalar> 
-    FORCEINLINE 
-    bool operator<=(Scalar a, Scalar b)
-    {
-        return !(b < a);
-    }
-
-    template <typename Scalar> 
-    FORCEINLINE 
-    bool operator>=(Scalar a, Scalar b)
-    {
-        return !(a < b);
-    }
 
     template <typename Scalar>
     FORCEINLINE
@@ -315,6 +293,8 @@ namespace mt
 
 #if USE_IEEE_754
        
+#if !HAS_CPP11_SUPPORT
+
     FORCEINLINE
     bool isnan(float a) 
     {
@@ -332,6 +312,8 @@ namespace mt
     {
         return (bitcast<int32_t>(a) & 0x7fffffff) < 0x7f800000;
     }
+
+#endif
 
     FORCEINLINE
     bool ispositive(float a) 

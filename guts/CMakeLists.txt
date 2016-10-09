@@ -1,6 +1,5 @@
 add_executable(guts
   Allocator.hpp
-  Array.hpp
   Deque.hpp
   Endian.hpp
   FileUtils.hpp

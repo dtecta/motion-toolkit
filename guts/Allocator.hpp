@@ -42,13 +42,13 @@ namespace guts
 
         typedef value_type* pointer;
         typedef const value_type* const_pointer;
-        
+
         typedef value_type& reference;
         typedef const value_type& const_reference;
-        
+
         typedef size_t size_type;
         typedef ptrdiff_t difference_type;
-        
+
         template<typename U>
         struct rebind { typedef Allocator<U> other; };
 
@@ -59,7 +59,7 @@ namespace guts
 
         pointer address(reference x) const { return &x; }
         const_pointer address(const_reference x) const { return &x; }
-        
+
         pointer allocate(size_type n, const void* = 0)
         {
             return ALLOCATE_ARRAY(T, n);
@@ -69,22 +69,40 @@ namespace guts
         {
             DEALLOCATE(p);
         }
-        
-        size_type max_size() const 
-        { 
+
+        size_type max_size() const
+        {
             return size_type(-1) / sizeof(T);
         }
-        
+
+#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+
+        template <typename U, typename... Args>
+        void construct(U* p, Args&&... args)
+        {
+            ::new(p) U(std::forward<Args>(args)...);
+        }
+
+        template <typename U>
+        void destroy(U* p)
+        {
+            p->~U();
+        }
+
+#else
+
         void construct(pointer p, const_reference v)
         {
             new (p) T(v);
         }
-        
+
         void destroy(pointer p)
         {
             p->~T();
         }
-
+        
+#endif
+ 
     private:
         Allocator<T>& operator=(const Allocator<T>&);
     };      

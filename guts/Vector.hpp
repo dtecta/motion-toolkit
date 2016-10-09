@@ -36,6 +36,11 @@ namespace guts
         typedef std::vector<T, Allocator<T> > RT;
 #endif 
     };
+
+#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+	template <typename T>
+	using vector = std::vector<T, Allocator<T>>;
+#endif
 } 
 
 #endif

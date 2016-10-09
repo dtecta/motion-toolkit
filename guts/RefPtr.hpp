@@ -53,7 +53,7 @@ namespace guts
     class RefPtr
     {
     public:
-        RefPtr(T* ptr = 0)
+        RefPtr(T* ptr = nullptr)
         {
             acquire(ptr);
         } 
@@ -97,25 +97,25 @@ namespace guts
 
         T& operator*() const 
         {
-            ASSERT(mPtr != 0 && mPtr->refCount() != 0); 
+            ASSERT(mPtr != nullptr && mPtr->refCount() != 0); 
             return *mPtr; 
         }
 
         T* operator->() const 
         {
-            ASSERT(mPtr != 0 && mPtr->refCount() != 0); 
+            ASSERT(mPtr != nullptr && mPtr->refCount() != 0); 
             return mPtr; 
         }
 
         T* get() const { return mPtr; }
 
-        bool operator!() const { return mPtr == 0; }
+        bool operator!() const { return mPtr == nullptr; }
 
     private:
         void acquire(T* ptr)
         {
             mPtr = ptr;
-            if (mPtr != 0)
+            if (mPtr != nullptr)
             {
                 mPtr->increase();
             }
@@ -123,31 +123,46 @@ namespace guts
         
         void release()
         {
-            if (mPtr != 0)
+            if (mPtr != nullptr)
             {
                 mPtr->decrease();
             }
-            // mPtr = 0; is not necessary, since release is not called directly.
+            // mPtr = nullptr; is not necessary, since release is not called directly.
         }
 
         T* mPtr;
     }; 
 
+	template <typename T>
+    FORCEINLINE
+    bool operator==(const RefPtr<T>& lhs, std::nullptr_t)
+    {
+        return lhs.get() == nullptr; 
+    }
+
+    template <typename T>
+    FORCEINLINE
+    bool operator==(std::nullptr_t, const RefPtr<T>& rhs)
+    {
+        return nullptr == rhs.get(); 
+    }
+
+
     template <typename T>
     FORCEINLINE
     bool operator==(const RefPtr<T>& lhs, int)
     {
-        return lhs.get() == 0; 
+        return lhs.get() == nullptr; 
     }
 
     template <typename T>
     FORCEINLINE
     bool operator==(int, const RefPtr<T>& rhs)
     {
-        return 0 == rhs.get(); 
+        return nullptr == rhs.get(); 
     }
-
-    template <typename T, typename U>
+	
+	template <typename T, typename U>
     FORCEINLINE
     bool operator==(const RefPtr<T>& lhs, const U* rhs)
     {
@@ -170,17 +185,32 @@ namespace guts
 
     template <typename T>
     FORCEINLINE
+    bool operator!=(const RefPtr<T>& lhs, std::nullptr_t)
+    {
+        return lhs.get() != nullptr; 
+    }
+
+    template <typename T>
+    FORCEINLINE
+    bool operator!=(std::nullptr_t, const RefPtr<T>& rhs)
+    {
+        return nullptr != rhs.get(); 
+    }
+
+    template <typename T>
+    FORCEINLINE
     bool operator!=(const RefPtr<T>& lhs, int)
     {
-        return lhs.get() != 0; 
+        return lhs.get() != nullptr; 
     }
 
     template <typename T>
     FORCEINLINE
     bool operator!=(int, const RefPtr<T>& rhs)
     {
-        return 0 != rhs.get(); 
+        return nullptr != rhs.get(); 
     }
+
 
     template <typename T, typename U>
     FORCEINLINE
