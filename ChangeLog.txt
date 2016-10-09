@@ -1,5 +1,13 @@
+2016-10-9: version 1.1
+Added curve library as an example of how to use dual numbers for
+automatic differentiation.
+API changes:
+In Matrix2x2.hpp, renamed 'tmul' and 'mult' to resp. 'transposeMul' and
+'mulTranspose' to match Matrix3x3.hpp
+
+
 2016-3-7: version 1.0
-Add jointlimits example code accompanying Chapter 10 "Rotational Joint Limits
+Added jointlimits example code accompanying Chapter 10 "Rotational Joint Limits
 in Quaternion Space" of "Game Engine Gems 3".
 API changes:
 In DualVector3.hpp, renamed 'linvel' to 'moment'
