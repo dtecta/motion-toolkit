@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.8.8)
 
 project(motion-toolkit)
 
+if(UNIX)
 option(BUILD_WITH_CPP11_SUPPORT "Compile with C++11 support enabled" ON)
+endif(UNIX)
 
 set(CMAKE_DEBUG_POSTFIX  "_d")
 
