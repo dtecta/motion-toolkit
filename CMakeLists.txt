@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.8)
 
 project(motion-toolkit)
 
+option(BUILD_WITH_CPP11_SUPPORT "Compile with C++11 support enabled" ON)
+
 set(CMAKE_DEBUG_POSTFIX  "_d")
 
 include_directories(
@@ -24,7 +26,10 @@ endif(MSVC)
 
 if(UNIX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -ffast-math -msse2 -mfpmath=sse")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fno-rtti -ffast-math -msse2 -mfpmath=sse")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-rtti -ffast-math -msse2 -mfpmath=sse")
+  if(BUILD_WITH_CPP11_SUPPORT)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  endif(BUILD_WITH_CPP11_SUPPORT)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread") 
 endif(UNIX)
   
