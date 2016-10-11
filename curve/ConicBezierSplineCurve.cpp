@@ -19,7 +19,7 @@ namespace cv
         Scalar h = Scalar((mPoints.size() - 1) / 2);
             
         Scalar intg;
-        Scalar frac = modf(param * h, &intg);
+        Scalar frac = mt::modf(param * h, &intg);
         int index = int(intg) * 2;
         if (index + 1 == int(mPoints.size()))
         {
