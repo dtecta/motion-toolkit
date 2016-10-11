@@ -101,7 +101,7 @@ namespace cv
     bool Extruder::hasLoop() const
     {
         ASSERT(!mSamples.empty());
-        for (auto it = mSamples.begin(), last = mSamples.end() - 1; it != last; ++it)
+        for (std::vector<Sample>::const_iterator it = mSamples.begin(), last = mSamples.end() - 1; it != last; ++it)
         {
             const Sample& from = *it;
             const Sample& to = *(it + 1);
@@ -119,7 +119,7 @@ namespace cv
     bool Extruder::fixLoop()
     {
         ASSERT(mSamples.size() >= 2);
-        for (auto it = mSamples.begin(), end = mSamples.end() - 2; it != end; ++it)
+        for (std::vector<Sample>::iterator it = mSamples.begin(), end = mSamples.end() - 2; it != end; ++it)
         {
             const Sample& from = *it;
             const Sample& to = *(it + 1);

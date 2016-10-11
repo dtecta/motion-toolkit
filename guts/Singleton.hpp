@@ -19,10 +19,10 @@ namespace guts
     public:
         static Derived& instance() 
         {
-            if (sInstance == nullptr)
+            if (sInstance == NULLPTR)
             {
                 Derived* instance = new Derived; 
-                if (INTERLOCKED_COMPARE_EXCHANGE_POINTER(&sInstance, instance, nullptr) != nullptr)
+                if (INTERLOCKED_COMPARE_EXCHANGE_POINTER(&sInstance, instance, NULLPTR) != NULLPTR)
                 {
                     delete instance;
                 }
@@ -35,7 +35,7 @@ namespace guts
     };
 
     template <typename Derived>
-    Derived* volatile Singleton<Derived>::sInstance = nullptr;
+    Derived* volatile Singleton<Derived>::sInstance = NULLPTR;
 }
 
 #endif

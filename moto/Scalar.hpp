@@ -22,9 +22,6 @@
 #define CONSCIENCE_NAGGING 0
 #define APPROX_RECIPROCAL_SQRT 0
 
-// Can't use this in VC12 __cplusplus >= 201103L
-#define HAS_CPP11_SUPPORT 1
-
 namespace mt
 {  
     template <typename Scalar> Scalar acos(Scalar x);

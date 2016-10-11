@@ -37,7 +37,7 @@ namespace guts
 #endif 
     };
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+#if HAS_CPP11_SUPPORT
 	template <typename T>
 	using vector = std::vector<T, Allocator<T>>;
 #endif

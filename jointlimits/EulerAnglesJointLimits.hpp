@@ -23,7 +23,7 @@ namespace ik
 
 
         // JointLimits overrides
-        virtual void bound(DualQuaternion& relPose) const override;
+        virtual void bound(DualQuaternion& relPose) const OVERRIDE;
 
     protected:
         Interval mLimits[3];   
