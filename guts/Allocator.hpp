@@ -77,7 +77,7 @@ namespace guts
             return size_type(-1) / sizeof(T);
         }
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+#if HAS_CPP11_SUPPORT
 
         template <typename U, typename... Args>
         void construct(U* p, Args&&... args)

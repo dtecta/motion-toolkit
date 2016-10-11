@@ -22,7 +22,7 @@ namespace cv
             , mRadius(radius)
         {}
 
-        virtual DualVector3 eval(Scalar param) const override;
+        virtual DualVector3 eval(Scalar param) const OVERRIDE;
 
     private:
         Vector3 mCenter;

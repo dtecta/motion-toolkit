@@ -20,7 +20,7 @@ namespace cv
     {
     public:
       
-        virtual DualVector3 eval(Scalar param) const override;
+        virtual DualVector3 eval(Scalar param) const OVERRIDE;
 
     };
 }

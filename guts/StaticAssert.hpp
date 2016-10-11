@@ -9,7 +9,7 @@
 #ifndef GUTS_STATICASSERT_HPP
 #define GUTS_STATICASSERT_HPP
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+#if HAS_CPP11_SUPPORT
 
 #define STATIC_ASSERT(expr) static_assert(expr, "Compile-time assertion failed: " #expr)
 

@@ -21,7 +21,7 @@ namespace cv
             : mAlpha(0.5)
         {}
 
-        virtual DualVector3 eval(Scalar param) const override;
+        virtual DualVector3 eval(Scalar param) const OVERRIDE;
 
         void setTension(Scalar tension) { mAlpha = (Scalar(1) - tension) * Scalar(0.5); }
         

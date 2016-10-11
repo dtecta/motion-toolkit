@@ -26,7 +26,7 @@ namespace guts
         typedef std::multimap<Key, Data, Compare, Allocator<std::pair<const Key, Data> > > RT;
     };
 
-#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+#if HAS_CPP11_SUPPORT
 
     template <typename Key, typename Data, typename Compare = std::less<Key>>
     using map = std::map<Key, Data, Compare, Allocator<std::pair<const Key, Data>>>;

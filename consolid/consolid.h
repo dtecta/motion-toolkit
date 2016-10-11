@@ -24,8 +24,6 @@
 #   pragma warning(disable: 4800) 
 #endif 
 
-
-
 #if defined(_MSC_VER) && (_MSC_VER < 1600)
 
 typedef signed __int8  int8_t;
@@ -42,6 +40,26 @@ typedef unsigned __int64 uint64_t;
 
 #include <stdint.h>
 
+#endif
+
+#if (__cplusplus >= 201103L) || (_MSC_VER >= 1800)
+#   define HAS_CPP11_SUPPORT 1
+#endif
+
+#ifndef NULLPTR
+#   if HAS_CPP11_SUPPORT
+#      define NULLPTR nullptr
+#   else
+#      define NULLPTR 0
+#   endif
+#endif
+
+#ifndef OVERRIDE
+#   if HAS_CPP11_SUPPORT
+#      define OVERRIDE override
+#   else
+#      define OVERRIDE
+#   endif
 #endif
 
 #ifndef ASSERT
