@@ -134,9 +134,9 @@ namespace mt
     FORCEINLINE 
     Matrix4x4<Scalar>::Matrix4x4(const Vector3<Scalar>& p)
     {
-        mRow[0] = Vector4<Scalar>(Unit<0>(), p.x);
-        mRow[1] = Vector4<Scalar>(Unit<1>(), p.y);
-        mRow[2] = Vector4<Scalar>(Unit<2>(), p.z);
+        mRow[0] = Vector4<Scalar>(Vector3<Scalar>(Unit<0>()), p.x);
+        mRow[1] = Vector4<Scalar>(Vector3<Scalar>(Unit<1>()), p.y);
+        mRow[2] = Vector4<Scalar>(Vector3<Scalar>(Unit<2>()), p.z);
         mRow[3] = Unit<3>();
     }
 
@@ -191,7 +191,7 @@ namespace mt
     FORCEINLINE
     void Matrix4x4<Scalar>::setValue(const Scalar2* v)
     {
-		mRow[0] = Vector4<Scalar>(Scalar(v[0]), Scalar(v[4]), Scalar(v[8]), Scalar(v[12])); 
+        mRow[0] = Vector4<Scalar>(Scalar(v[0]), Scalar(v[4]), Scalar(v[8]), Scalar(v[12])); 
         mRow[1] = Vector4<Scalar>(Scalar(v[1]), Scalar(v[5]), Scalar(v[9]), Scalar(v[13])); 
         mRow[2] = Vector4<Scalar>(Scalar(v[2]), Scalar(v[6]), Scalar(v[10]), Scalar(v[14]));
         mRow[3] = Vector4<Scalar>(Scalar(v[3]), Scalar(v[7]), Scalar(v[11]), Scalar(v[15])); 
@@ -282,8 +282,8 @@ namespace mt
     {
         return all(a[0] == b[0]) && 
                all(a[1] == b[1]) && 
-			   all(a[2] == b[2]) && 
-			   all(a[3] == b[3]);
+               all(a[2] == b[2]) && 
+               all(a[3] == b[3]);
     }
 
   
@@ -315,8 +315,8 @@ namespace mt
     Matrix3x3<Scalar> basis(const Matrix4x4<Scalar>& a)
     {
         return Matrix3x3<Scalar>(a[0][0], a[0][1], a[0][2],
-								 a[1][0], a[1][1], a[1][2],
-								 a[2][0], a[2][1], a[2][2]); 
+                                 a[1][0], a[1][1], a[1][2],
+                                 a[2][0], a[2][1], a[2][2]);
     }
      
     template <typename Scalar>
@@ -386,7 +386,7 @@ namespace mt
     FORCEINLINE 
     Matrix4x4<Scalar> transpose(const Matrix4x4<Scalar>& a)
     {
-        return Matrix4x4<Scalar>(row(a, 0), row(a, 1), row(a, 2), row(a, 3));
+        return Matrix4x4<Scalar>(column(a, 0), column(a, 1), column(a, 2), column(a, 3));
     } 
 
     template <typename Scalar>
@@ -455,7 +455,7 @@ namespace mt
     Matrix4x4<Scalar> inverse(const Matrix4x4<Scalar>& a)
     {
         // From: Streaming SIMD Extensions - Inverse of 4x4 Matrix, Intel
-		
+        
         Scalar tmp[12]; /* temp array for pairs */
      
         Matrix4x4<Scalar> dst;
@@ -554,7 +554,7 @@ namespace mt
     FORCEINLINE 
     void convert(Scalar1* v, const Matrix4x4<Scalar2>& a)
     {
-		v[0] = Scalar1(a[0][0]); v[4] = Scalar1(a[0][1]); v[8] = Scalar1(a[0][2]); v[12] = Scalar1(a[0][3]); 
+        v[0] = Scalar1(a[0][0]); v[4] = Scalar1(a[0][1]); v[8] = Scalar1(a[0][2]); v[12] = Scalar1(a[0][3]); 
         v[1] = Scalar1(a[1][0]); v[5] = Scalar1(a[1][1]); v[9] = Scalar1(a[1][2]); v[13] = Scalar1(a[1][3]); 
         v[2] = Scalar1(a[2][0]); v[6] = Scalar1(a[2][1]); v[10] = Scalar1(a[2][2]); v[14] = Scalar1(a[2][3]);  
         v[3] = Scalar1(a[3][0]); v[7] = Scalar1(a[3][1]); v[11] = Scalar1(a[3][2]); v[15] = Scalar1(a[3][3]);
@@ -564,7 +564,5 @@ namespace mt
 #if USE_SSE
 #include <moto/Matrix4x4_SSE.hpp>
 #endif
-
-
 
 #endif

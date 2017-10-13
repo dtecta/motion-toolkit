@@ -1,3 +1,14 @@
+2017-10-13: 
+Added Matrix3x3 'orthonormalize'.
+Added 'xy' function to cast a Vector3 to a Vector2.
+Fixed Matrix4x4 'transpose' (non-sse).
+Removed Vector4 'norm' function as it was already provided by 'lengthSquared' in Metric.hpp.
+The 'abs' function on Vector4 now returns the component-wise absolute of Vector4 rather than magnitude.
+(Previously 'abs' was provided for quaternions as a generalization of 'abs' for complex numbers, but this was confusing
+since 'abs' on Vector3 returned the component-wise absolute. Now both overloads have the same semantic. The magnitude
+of a quaternion can be returned using 'length' in Metric.hpp.)
+Updated Google test to the latest version.
+
 2016-10-9: version 1.1
 Added curve library as an example of how to use dual numbers for
 automatic differentiation.

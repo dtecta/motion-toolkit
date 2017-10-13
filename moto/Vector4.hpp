@@ -32,8 +32,7 @@ namespace mt
         typedef Scalar ScalarType; 
       
         Vector4();
-        Vector4(Scalar x, Scalar y, Scalar z, Scalar w);  
-        
+        Vector4(Scalar x, Scalar y, Scalar z, Scalar w = Scalar());
         Vector4(Zero);
         Vector4(Identity);
         template <int I> Vector4(Unit<I>); 
@@ -122,8 +121,7 @@ namespace mt
     template <typename Scalar1, typename Scalar2>
     typename Promote<Scalar1, Scalar2>::RT dot4(const Vector4<Scalar1>& a, const Vector4<Scalar2>& b); 
 
-    template <typename Scalar> Scalar norm(const Vector4<Scalar>& a);  
-    template <typename Scalar> Scalar abs(const Vector4<Scalar>& a);    
+    template <typename Scalar> Vector4<Scalar> abs(const Vector4<Scalar>& a);    
     template <typename Scalar> Scalar arg(const Vector4<Scalar>& a);  
 
     template <typename Scalar1, typename Scalar2>
@@ -504,9 +502,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>(a.x + b.x, 
-						   a.y + b.y, 
-						   a.z + b.z, 
-						   a.w + b.w);
+                           a.y + b.y, 
+                           a.z + b.z, 
+                           a.w + b.w);
     }
 
   
@@ -517,9 +515,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>(a.x - b.x, 
-						   a.y - b.y, 
-						   a.z - b.z, 
-						   a.w - b.w);
+                           a.y - b.y, 
+                           a.z - b.z, 
+                           a.w - b.w);
     }  
 
     template <typename Scalar1, typename Scalar2>
@@ -529,9 +527,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>(a.x * b.x, 
-						   a.y * b.y, 
-						   a.z * b.z, 
-						   a.w * b.w);
+                           a.y * b.y, 
+                           a.z * b.z, 
+                           a.w * b.w);
     }  
 
 
@@ -619,16 +617,12 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE
-    Scalar norm(const Vector4<Scalar>& a)
+    Vector4<Scalar> abs(const Vector4<Scalar>& a)
     {
-        return dot(a, a);
-    }    
-
-    template <typename Scalar>
-    FORCEINLINE
-    Scalar abs(const Vector4<Scalar>& a)
-    {
-        return sqrt(norm(a));
+        return Vector4<Scalar>(abs(a.x),
+                               abs(a.y),
+                               abs(a.z),
+                               abs(a.w));
     }  
 
     template <typename Scalar>
@@ -706,9 +700,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>(a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-						   a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
-						   a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
-						   a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
+                           a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
+                           a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
+                           a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z);
     }
 
     template <typename Scalar1, typename Scalar2>
@@ -718,9 +712,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>( a.w * b.x + a.y * b.z - a.z * b.y,
-							a.w * b.y + a.z * b.x - a.x * b.z,
-							a.w * b.z + a.x * b.y - a.y * b.x,
-						   -a.x * b.x - a.y * b.y - a.z * b.z);
+                            a.w * b.y + a.z * b.x - a.x * b.z,
+                            a.w * b.z + a.x * b.y - a.y * b.x,
+                           -a.x * b.x - a.y * b.y - a.z * b.z);
     }
 
     template <typename Scalar1, typename Scalar2>
@@ -730,9 +724,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>( a.x * b.w + a.y * b.z - a.z * b.y,
-							a.y * b.w + a.z * b.x - a.x * b.z,
-							a.z * b.w + a.x * b.y - a.y * b.x,
-						   -a.x * b.x - a.y * b.y - a.z * b.z);
+                            a.y * b.w + a.z * b.x - a.x * b.z,
+                            a.z * b.w + a.x * b.y - a.y * b.x,
+                           -a.x * b.x - a.y * b.y - a.z * b.z);
     }
 
     template <typename Scalar1, typename Scalar2>
@@ -742,9 +736,9 @@ namespace mt
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector4<RT>( a.y * b.z - a.z * b.y,
-							a.z * b.x - a.x * b.z,
-							a.x * b.y - a.y * b.x,
-						   -a.x * b.x - a.y * b.y - a.z * b.z);
+                            a.z * b.x - a.x * b.z,
+                            a.x * b.y - a.y * b.x,
+                           -a.x * b.x - a.y * b.y - a.z * b.z);
     }   
 
   

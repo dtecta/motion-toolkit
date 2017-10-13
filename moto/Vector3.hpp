@@ -17,6 +17,7 @@
 #include <istream>
 #endif
 
+#include <moto/Vector2.hpp>
 #include <moto/Promote.hpp>
 #include <moto/Scalar.hpp>
 #include <moto/Algebra.hpp>
@@ -93,6 +94,8 @@ namespace mt
   
     template <typename Scalar1, typename Scalar2> 
     Vector3<typename Promote<Scalar1, Scalar2>::RT> operator/(const Vector3<Scalar1>& a, Scalar2 s);
+
+    template <typename Scalar> const Vector2<Scalar>& xy(const Vector3<Scalar>& a); 
     
     template <typename Scalar1, typename Scalar2>
     typename Promote<Scalar1, Scalar2>::RT dot(const Vector3<Scalar1>& a, const Vector3<Scalar2>& b); 
@@ -372,7 +375,7 @@ namespace mt
     template <typename Scalar1,typename Scalar2>
     FORCEINLINE 
     Vector3<typename Promote<Scalar1, Scalar2>::RT> 
-	operator*(const Vector3<Scalar1>& a, Scalar2 s)
+    operator*(const Vector3<Scalar1>& a, Scalar2 s)
     {
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return Vector3<RT>(a.x * s,
@@ -396,6 +399,13 @@ namespace mt
         ASSERT(!iszero(s)); 
         typedef typename Promote<Scalar1, Scalar2>::RT RT; 
         return a * (RT(1) / RT(s));
+    }
+
+    template <typename Scalar> 
+    FORCEINLINE
+    const Vector2<Scalar>& xy(const Vector3<Scalar>& a)
+    {
+        return reinterpret_cast<const Vector2<Scalar>&>(a); 
     }
 
     template <typename Scalar1, typename Scalar2>

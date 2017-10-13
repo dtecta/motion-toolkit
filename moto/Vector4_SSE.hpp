@@ -20,27 +20,27 @@
 
 namespace mt
 { 
-	FORCEINLINE
-	__m128 div(__m128 a, __m128 b)
-	{
+    FORCEINLINE
+    __m128 div(__m128 a, __m128 b)
+    {
 #if USE_APPROX
-		return _mm_mul_ps(a, _mm_rcp_ps(b));
+        return _mm_mul_ps(a, _mm_rcp_ps(b));
 #else
-		return _mm_div_ps(a, b);
+        return _mm_div_ps(a, b);
 #endif 
-	}
-	
-	FORCEINLINE
-	__m128 div(__m128 a, float s)
-	{
-		ASSERT(s != 0.0f);
-		
+    }
+    
+    FORCEINLINE
+    __m128 div(__m128 a, float s)
+    {
+        ASSERT(s != 0.0f);
+        
 #if USE_FDIV
-		return _mm_mul_ps(a, _mm_set1_ps(1.0f / s));
+        return _mm_mul_ps(a, _mm_set1_ps(1.0f / s));
 #else
-		return div(a, _mm_set1_ps(1));
+        return div(a, _mm_set1_ps(1));
 #endif
-	}
+    }
 
 #if WASTE_CYCLES
 
@@ -76,7 +76,7 @@ namespace mt
         typedef float ScalarType; 
       
         Vector4(); 
-        Vector4(float x, float y, float z, float w);   
+        Vector4(float x, float y, float z, float w = float());   
         explicit Vector4(__m128 v); 
         explicit Vector4(const float* v);  
 

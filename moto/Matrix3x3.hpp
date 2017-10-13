@@ -141,6 +141,7 @@ namespace mt
     template <typename Scalar> Matrix3x3<Scalar> transpose(const Matrix3x3<Scalar>& a);
     template <typename Scalar> Matrix3x3<Scalar> adjoint(const Matrix3x3<Scalar>& a);
     template <typename Scalar> Matrix3x3<Scalar> inverse(const Matrix3x3<Scalar>& a);
+    template <typename Scalar> Matrix3x3<Scalar> orthonormalize(const Matrix3x3<Scalar>& a);
     template <typename Scalar> Scalar trace(const Matrix3x3<Scalar>& a);  
     template <typename Scalar> Vector4<Scalar> rotation(const Matrix3x3<Scalar>& a);
     template <typename Scalar> Vector3<Scalar> diagonal(const Matrix3x3<Scalar>& a);
@@ -655,6 +656,18 @@ namespace mt
         return Matrix3x3<Scalar>(co[0] * s, cofactor<1, 0>(a) * s, cofactor<2, 0>(a) * s, 
                                  co[1] * s, cofactor<1, 1>(a) * s, cofactor<2, 1>(a) * s,
                                  co[2] * s, cofactor<1, 2>(a) * s, cofactor<2, 2>(a) * s);
+    }
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Matrix3x3<Scalar> orthonormalize(const Matrix3x3<Scalar>& a)
+    {
+        Matrix3x3<Scalar> result;
+        result[0] = normalize(a[0]);
+        result[1] = normalize(a[1]);
+        result[2] = cross(result[0], result[1]);
+        result[1] = cross(result[2], result[0]);
+        return result;
     }
 
     template <typename Scalar>

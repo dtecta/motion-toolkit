@@ -100,7 +100,7 @@ Platforms
 MoTo has been tested on the following platforms:
 
     Linux 32-bit/64-bit  gcc 3.4
-	Win32 32-bit/64-bit	 MSVC 8.0 SP1, 9.0 SP1, 10, 11, 12
+	Win32 32-bit/64-bit	 MSVC 8.0 SP1, 9.0 SP1, 10, 11, 12, 14
 
   
 
