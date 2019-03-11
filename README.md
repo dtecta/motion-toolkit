@@ -92,7 +92,7 @@ Installation
 ------------
 
 MoTo itself can be readily used. For building consolid, jointlimits, and the
-unit tests in the test direcoty you need CMake 2.4 or up. Please, check the
+unit tests in the test directory you need CMake 2.4 or up. Please, check the
 CMake documentation on how to generate a MSVC project or makefiles for GCC.
 
 
