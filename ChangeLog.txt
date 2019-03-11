@@ -1,3 +1,18 @@
+2019-03-11:
+
+!!Matrix3x3 constructor from three vectors now takes rows instead of columns,
+in order to conform to the other matrix types. Sorry for the confusion.
+Matrix3x3::setValue taking three vectors has been replaced by setColumns and
+setRows. I'm terrible, I know.
+
+In Vector3.hpp, added 'normal' and modified 'triple' for respectively
+computing the normal to a triangle and the triple product of three vectors,
+such that the relative rounding error in the result is minimized.
+
+Updated ErrorTracer.hpp in accordance with my GDC 2019 presentation.
+
+Moved unit tests to a separate test directory.
+
 2017-10-13: 
 Added Matrix3x3 'orthonormalize'.
 Added 'xy' function to cast a Vector3 to a Vector2.

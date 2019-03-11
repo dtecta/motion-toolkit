@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -11,22 +11,23 @@
 
 #define USE_OSTREAM 1
 
-#include "Scalar.hpp"
-#include "Vector3.hpp"
-#include "Vector4.hpp"
-#include "Matrix2x2.hpp"
-#include "Matrix3x3.hpp"
-#include "Matrix4x4.hpp"
-#include "Metric.hpp"
-#include "Trigonometric.hpp"
-#include "Random.hpp"
+#include "moto/Scalar.hpp"
+#include "moto/Vector3.hpp"
+#include "moto/Vector4.hpp"
+#include "moto/Matrix2x2.hpp"
+#include "moto/Matrix3x3.hpp"
+#include "moto/Matrix4x4.hpp"
+#include "moto/Metric.hpp"
+#include "moto/Trigonometric.hpp"
+#include "moto/Random.hpp"
 
-#include "Dual.hpp"
-#include "DualVector3.hpp"
-#include "DualVector4.hpp"
-#include "DualMatrix3x3.hpp"
+#include "moto/Dual.hpp"
+#include "moto/DualVector3.hpp"
+#include "moto/DualVector4.hpp"
+#include "moto/DualMatrix3x3.hpp"
 
-
+#include "moto/Matrix3x4.hpp"
+#include "moto/Matrix4x3.hpp"
 
 typedef float Scalar;  // We use "Scalar" as the abstract type for real values. Change "float" to "double" here for double precision.
 
@@ -39,6 +40,8 @@ typedef mt::Matrix2x2<Scalar> Matrix2x2; // Matrix multiplication uses "mul" as 
 typedef mt::Vector4<Scalar> Quaternion; // mt::Vector4 is our template for quaternions. The quaternion product is "mul"
 typedef mt::Matrix3x3<Scalar> Matrix3x3; // Matrix multiplication uses "mul" as well.
 typedef mt::Matrix4x4<Scalar> Matrix4x4;
+typedef mt::Matrix3x4<Scalar> Matrix3x4;
+typedef mt::Matrix4x3<Scalar> Matrix4x3;
 
 // These class templates are instatiated for our dual numbers type.
 typedef mt::Dual<Scalar> Dual; 
@@ -77,6 +80,22 @@ template <typename Vector>
 void testFuzzyEqual(const Vector& lhs, const Vector& rhs)
 {
     EXPECT_LE(lengthSquared(lhs - rhs), ScalarTraits::epsilon());
+}
+
+
+void testFuzzyEqual(const Matrix3x3& lhs, const Matrix3x3& rhs)
+{
+    testFuzzyEqual(lhs[0], rhs[0]);
+    testFuzzyEqual(lhs[1], rhs[1]);
+    testFuzzyEqual(lhs[2], rhs[2]);
+}
+
+void testFuzzyEqual(const Matrix4x4& lhs, const Matrix4x4& rhs)
+{
+    testFuzzyEqual(lhs[0], rhs[0]);
+    testFuzzyEqual(lhs[1], rhs[1]);
+    testFuzzyEqual(lhs[2], rhs[2]);
+    testFuzzyEqual(lhs[3], rhs[3]);
 }
 
 void testFuzzyEqual(const DualQuaternion& lhs, const DualQuaternion& rhs)
@@ -431,10 +450,38 @@ TEST(DualNumbers, DualQuaternionLogarithm)
     }
 }
 
-GTEST_API_ int main(int argc, char **argv) 
+TEST(Matrices, Matrix4x3)
 {
-    testing::InitGoogleTest(&argc, argv);
+    Random random;
 
-    int result = RUN_ALL_TESTS();
-    return result;
+    Quaternion q = random.rotation();
+
+    Matrix4x3 psi = lquat4x3(q);
+   
+    Matrix3x3 rp1 = transposeMul(psi, psi);
+    testFuzzyEqual(Matrix3x3(Identity()), rp1);
+    
+    Matrix3x3 rp2 = mul(transpose(psi), psi);
+    testFuzzyEqual(Matrix3x3(Identity()), rp2);   
+
+    Matrix4x4 rp3 = mulTranspose(psi, psi);
+    testFuzzyEqual(Matrix4x4(Identity()) - dyad(q, q), rp3);
+
+    Vector3 rp4 = mul(q, psi);
+    testFuzzyEqual(Vector3(Zero()), rp4);
+
+
+    Matrix4x3 xsi = rquat4x3(q);
+
+    Matrix3x3 rx1 = transposeMul(xsi, xsi);
+    testFuzzyEqual(Matrix3x3(Identity()), rx1);
+
+    Matrix3x3 rx2 = mul(transpose(xsi), xsi);
+    testFuzzyEqual(Matrix3x3(Identity()), rx2);
+
+    Matrix4x4 rx3 = mulTranspose(xsi, xsi);
+    testFuzzyEqual(Matrix4x4(Identity()) - dyad(q, q), rx3);
+
+    Vector3 rx4 = mul(q, xsi);
+    testFuzzyEqual(Vector3(Zero()), rx4);
 }

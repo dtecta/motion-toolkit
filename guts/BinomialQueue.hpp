@@ -1,9 +1,9 @@
 /*  Guts - Generic Utilities 
-	Copyright (c) 2006 Gino van den Bergen, DTECTA 
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA 
 
-	Source published under the terms of the MIT License. 
-	For details please see COPYING file or visit 
-	http://opensource.org/licenses/MIT
+    Source published under the terms of the MIT License. 
+    For details please see COPYING file or visit 
+    http://opensource.org/licenses/MIT
 */
 
 #ifndef GUTS_BINOMIALQUEUE_HPP
@@ -88,9 +88,9 @@ namespace guts
         GUARD_INVARIANT_AT_EXIT(this);
 
         for (size_t i = 0 ; i != 32; ++i)
-		{
-			mTrees[i] = NO_REF;
-		}
+        {
+            mTrees[i] = NO_REF;
+        }
     }  
             
     template <typename Key>

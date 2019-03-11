@@ -69,29 +69,31 @@ Trigonometric.hpp.
 emt64 (amd64) platform. The specializations are implemented using SSE
 intrinsics. See Vector4_SSE.hpp and Matrix4x4_SSE.hpp for details.
 
-
 A dual number class is defined in Dual.hpp. Pluecker coordinates, spatial
 vectors, and motor algebra requires DualVector3.hpp. Dual quaternions can be
 created using DualVector4.hpp. See my GDC Europe 2009
-presentation "Dual Numbers. Simple Math, Easy C++ Coding, and Lots of Tricks"
+presentation _Dual Numbers. Simple Math, Easy C++ Coding, and Lots of Tricks_
 for details.
 
 Sample code on how to make use of mt::Dual and other classes can be found in
-UnitTest.cpp
-
+test/moto.
 
 The directory 'jointlimits' holds the sample code accompanying Chapter 10
 _Rotational Joint Limits in Quaternion Space_ of _Game Engine Gems 3_.
 Please, refer to the source code and chapter for details. Documentation for
 the jointlimits can be generated using Doxygen + graphpviz.
 
+The accompanying code for my GDC 2019 presentation _Understanding and Tracing
+Numerical Errors in C++_ is moto/ErrorTracer.hpp. A sample on how to use the
+ErrorTracer class can be found in test/moto/NumericalTests.cpp.  
+
 
 Installation
 ------------
 
-MoTo itself can be readily used. For building consolid and the UnitTest.cpp
-sample you need CMake 2.4 or up. Please, check the CMake documentation on how
-to generate a MSVC project or makefiles for GCC.
+MoTo itself can be readily used. For building consolid, jointlimits, and the
+unit tests in the test direcoty you need CMake 2.4 or up. Please, check the
+CMake documentation on how to generate a MSVC project or makefiles for GCC.
 
 
 Platforms

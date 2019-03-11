@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -30,6 +30,8 @@ namespace mt
     template <typename To, typename From> To bitcast(From from);
     
 #if !HAS_CPP11_SUPPORT
+    template <typename Scalar> Scalar log2(Scalar x);
+
     template <typename Scalar> bool isnan(Scalar a); 
     template <typename Scalar> bool isinf(Scalar a); 
     template <typename Scalar> bool isfinite(Scalar a);  
@@ -56,9 +58,9 @@ namespace mt
     template <typename Scalar> Scalar rsqrt(Scalar a);
 
     template <typename Scalar> Scalar square(Scalar x);
-    template <typename Scalar> Scalar cube(Scalar x); 
+    template <typename Scalar> Scalar cube(Scalar x);
 
-    template <typename Scalar> Scalar smooth(Scalar x);
+    template <typename Scalar> Scalar smoothstep(Scalar a, Scalar b, Scalar x);
    
     // All other functions are simply dumped into our namespace.
 
@@ -84,6 +86,7 @@ namespace mt
     using std::tanh;
 
 #if HAS_CPP11_SUPPORT
+    using std::log2;
     using std::isnan;
     using std::isinf;
     using std::isfinite;
@@ -102,8 +105,6 @@ namespace mt
     {
         return std::asin(clamp(x, Scalar(-1), Scalar(1)));
     }
-  
-
 
     template <typename To, typename From> 
     FORCEINLINE
@@ -121,8 +122,19 @@ namespace mt
         return pun.to;  
 #endif
     }
+
+    template <typename Scalar>
+    FORCEINLINE
+    Scalar log2(Scalar x) 
+    {
+        static const Scalar ONE_OVER_LOG2 = Scalar(1) / log(Scalar(2));
+
+        return log(x) * ONE_OVER_LOG2;
+    }
+
  
 #if !HAS_CPP11_SUPPORT
+
     template <typename Scalar>
     FORCEINLINE
     bool isnan(Scalar a) 
@@ -173,7 +185,6 @@ namespace mt
         return Scalar(1) / a < Scalar();
     }
   
-
     template <typename Scalar>
     FORCEINLINE
     bool isequalnn(Scalar a, Scalar b) 

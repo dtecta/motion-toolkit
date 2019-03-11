@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -8,6 +8,8 @@
 
 #ifndef MT_MATRIX2X2_HPP
 #define MT_MATRIX2X2_HPP
+
+#include <guts/TypeTraits.hpp>
 
 #include <moto/Vector2.hpp>
 #include <moto/Algebra.hpp>
@@ -551,6 +553,12 @@ namespace mt
 		v1.y = s1 * v1.x;
 		v2.y = s2 * v2.x;
     }
+}
+
+namespace guts
+{
+    template <> struct TypeTraits<mt::Matrix2x2<float> > { enum { ID = TT_FLOAT2 | TT_2 }; };
+    template <> struct TypeTraits<mt::Matrix2x2<double> > { enum { ID = TT_DOUBLE2 | TT_2 }; };
 }
 
 #endif

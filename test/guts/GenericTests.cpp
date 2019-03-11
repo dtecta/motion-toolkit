@@ -1,17 +1,17 @@
 /*  Guts - Generic Utilities 
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
     http://opensource.org/licenses/MIT
 */
 
-#include "Vector.hpp"
-#include "Set.hpp"
-#include "HashTable.hpp"
-#include "BinomialQueue.hpp"
+#include "guts/Vector.hpp"
+#include "guts/Set.hpp"
+#include "guts/HashTable.hpp"
+#include "guts/BinomialQueue.hpp"
 
-#include "String.hpp"
+#include "guts/String.hpp"
 
 #include <iostream>
 #include <gtest/gtest.h>
@@ -113,13 +113,4 @@ TEST(Generic, HashTable)
             EXPECT_TRUE(set.find(x) == set.end());
         }
     }
-}
-
-
-GTEST_API_ int main(int argc, char **argv) 
-{
-    testing::InitGoogleTest(&argc, argv);
-
-    int result = RUN_ALL_TESTS();
-    return result;
 }

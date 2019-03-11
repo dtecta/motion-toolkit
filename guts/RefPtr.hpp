@@ -1,5 +1,5 @@
 /*  Guts - Generic Utilities 
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -134,6 +134,7 @@ namespace guts
     }; 
 
 #if HAS_CPP11_SUPPORT
+    
     template <typename T>
     FORCEINLINE
     bool operator==(const RefPtr<T>& lhs, std::nullptr_t)
@@ -147,6 +148,21 @@ namespace guts
     {
         return NULLPTR == rhs.get(); 
     }
+
+    template <typename T>
+    FORCEINLINE
+    bool operator!=(const RefPtr<T>& lhs, std::nullptr_t)
+    {
+        return lhs.get() != NULLPTR; 
+    }
+
+    template <typename T>
+    FORCEINLINE
+    bool operator!=(std::nullptr_t, const RefPtr<T>& rhs)
+    {
+        return NULLPTR != rhs.get(); 
+    }
+    
 #endif
 
     template <typename T>
@@ -182,20 +198,6 @@ namespace guts
     bool operator==(const RefPtr<T>& lhs, const RefPtr<U>& rhs)
     {
         return lhs.get() == rhs.get(); 
-    }
-
-    template <typename T>
-    FORCEINLINE
-    bool operator!=(const RefPtr<T>& lhs, std::nullptr_t)
-    {
-        return lhs.get() != NULLPTR; 
-    }
-
-    template <typename T>
-    FORCEINLINE
-    bool operator!=(std::nullptr_t, const RefPtr<T>& rhs)
-    {
-        return NULLPTR != rhs.get(); 
     }
 
     template <typename T>

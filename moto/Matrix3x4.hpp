@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -8,6 +8,8 @@
 
 #ifndef MT_MATRIX3X4_HPP
 #define MT_MATRIX3X4_HPP
+
+#include <guts/TypeTraits.hpp>
 
 #include <moto/Matrix3x3.hpp>
 #include <moto/Vector4.hpp>
@@ -25,7 +27,7 @@ namespace mt
         Matrix3x4(Identity);
         template <typename Scalar2> explicit Matrix3x4(const Scalar2* v);   
         Matrix3x4(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2, const Vector3<Scalar>& c3);
-		Matrix3x4(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2);
+        Matrix3x4(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2);
         Matrix3x4(const Vector3<Scalar>& p);
         Matrix3x4(const Matrix3x3<Scalar>& a, const Vector3<Scalar>& p = Zero());
         
@@ -73,7 +75,8 @@ namespace mt
 #endif
    
     template <typename Scalar> Vector3<Scalar> mul(const Matrix3x4<Scalar>& a, const Vector4<Scalar>& v);
-	template <typename Scalar> Vector4<Scalar> mul(const Vector4<Scalar>& v, const Matrix3x4<Scalar>& a);
+    template <typename Scalar> Vector4<Scalar> mul(const Vector3<Scalar>& v, const Matrix3x4<Scalar>& a);
+    template <typename Scalar> Vector4<Scalar> mul(const Vector4<Scalar>& v, const Matrix3x4<Scalar>& a);
 
     template <typename Scalar> Matrix3x4<Scalar> mul(const Matrix3x4<Scalar>& a, const Matrix3x4<Scalar>& b);
 
@@ -168,7 +171,7 @@ namespace mt
     FORCEINLINE
     void Matrix3x4<Scalar>::setValue(const Scalar2* v)
     {
-		mRow[0] = Vector4<Scalar>(Scalar(v[0]), Scalar(v[4]), Scalar(v[8]), Scalar(v[12])); 
+        mRow[0] = Vector4<Scalar>(Scalar(v[0]), Scalar(v[4]), Scalar(v[8]), Scalar(v[12])); 
         mRow[1] = Vector4<Scalar>(Scalar(v[1]), Scalar(v[5]), Scalar(v[9]), Scalar(v[13])); 
         mRow[2] = Vector4<Scalar>(Scalar(v[2]), Scalar(v[6]), Scalar(v[10]), Scalar(v[14])); 
     }  
@@ -182,7 +185,7 @@ namespace mt
         mRow[2] = Vector4<Scalar>(c0.z, c1.z, c2.z, c3.z);
     }
 
-	template <typename Scalar>
+    template <typename Scalar>
     FORCEINLINE 
     void Matrix3x4<Scalar>::setRows(const Vector4<Scalar>& r0, const Vector4<Scalar>& r1, const Vector4<Scalar>& r2)
     {
@@ -237,7 +240,7 @@ namespace mt
     {
         return all(a[0] == b[0]) && 
                all(a[1] == b[1]) && 
-			   all(a[2] == b[2]);
+               all(a[2] == b[2]);
     }
 
     template <typename Scalar>
@@ -259,8 +262,8 @@ namespace mt
     Matrix3x3<Scalar> basis(const Matrix3x4<Scalar>& a)
     {
         return Matrix3x3<Scalar>(a[0][0], a[0][1], a[0][2],
-								 a[1][0], a[1][1], a[1][2],
-								 a[2][0], a[2][1], a[2][2]); 
+                                 a[1][0], a[1][1], a[1][2],
+                                 a[2][0], a[2][1], a[2][2]); 
     }
      
     template <typename Scalar>
@@ -308,18 +311,25 @@ namespace mt
 
     template <typename Scalar>
     FORCEINLINE 
+    Vector4<Scalar> mul(const Vector3<Scalar>& v, const Matrix3x4<Scalar>& a)
+    {
+        return v.x * a[0] + v.y * a[1] + v.z * a[2];
+    }
+
+    template <typename Scalar>
+    FORCEINLINE 
     Vector4<Scalar> mul(const Vector4<Scalar>& v, const Matrix3x4<Scalar>& a)
     {
         return v.x * a[0] + v.y * a[1] + v.z * a[2] + Vector4<Scalar>(v.w);
     }
 
-	template <typename Scalar>
+    template <typename Scalar>
     FORCEINLINE 
     Matrix3x4<Scalar> mul(const Matrix3x4<Scalar>& a, const Matrix3x4<Scalar>& b)
     {
         return Matrix3x4<Scalar>(mul(a[0], b), 
-								 mul(a[1], b),
-								 mul(a[2], b));
+                                 mul(a[1], b),
+                                 mul(a[2], b));
     }
 
     template <typename Scalar>
@@ -355,7 +365,7 @@ namespace mt
     FORCEINLINE 
     void convert(Scalar1* v, const Matrix3x4<Scalar2>& a)
     {
-		v[0] = Scalar1(a[0][0]); v[4] = Scalar1(a[0][1]); v[8] = Scalar1(a[0][2]); v[12] = Scalar1(a[0][3]); 
+        v[0] = Scalar1(a[0][0]); v[4] = Scalar1(a[0][1]); v[8] = Scalar1(a[0][2]); v[12] = Scalar1(a[0][3]); 
         v[1] = Scalar1(a[1][0]); v[5] = Scalar1(a[1][1]); v[9] = Scalar1(a[1][2]); v[13] = Scalar1(a[1][3]); 
         v[2] = Scalar1(a[2][0]); v[6] = Scalar1(a[2][1]); v[10] = Scalar1(a[2][2]); v[14] = Scalar1(a[2][3]);  
         v[3] = Scalar1(); v[7] = Scalar1(); v[11] = Scalar1(); v[15] = Scalar1(1);
@@ -363,10 +373,14 @@ namespace mt
 
 }
 
+namespace guts
+{
+    template <> struct TypeTraits<mt::Matrix3x4<float> > { enum { ID = TT_FLOAT4 | TT_3 }; };
+    template <> struct TypeTraits<mt::Matrix3x4<double> > { enum { ID = TT_DOUBLE4 | TT_3 }; };
+}
+
 #if USE_SSE
 #include <moto/Matrix3x4_SSE.hpp>
 #endif
-
-
 
 #endif

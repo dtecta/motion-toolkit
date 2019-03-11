@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -14,323 +14,331 @@
 #endif
 
 #include "Scalar.hpp"
+#include "ScalarTraits.hpp"
 
 namespace mt
 {
-    template <typename Scalar> 
-    class ErrorTracer {
+    template <typename T> 
+    class ErrorTracer
+    {
     public:    
-        typedef Scalar Value_type;
+        typedef T Value_type;
 
-        ErrorTracer();
-        template <typename Scalar2> explicit ErrorTracer(Scalar2 value); 
-        ErrorTracer(Scalar value, Scalar error); 
+        explicit ErrorTracer(T value = T(), T error = T());
+
+        /// Floating-point value.
+        T value() const;
+
+        /// Estimated error bound.  
+        T error() const;
+
+        /// Estimated upper bound for the relative rounding error of this value. The value returned by maxRelativeError() is equal to the value returned by error() times the machine epsilon.
+        T maxRelativeError() const;
+
+        /// Number of dirty bits in the significand of this value. The number of least-signinifant bits that are contaminated by rounding. 
+        T dirtyBits() const;
+
+        /// Implicit cast of floating-point value.
+        operator T() const;
         
-        Scalar value() const;
-        Scalar error() const;
-
-        void setError(Scalar error);
-
-        operator Scalar() const;
-        
-        ErrorTracer<Scalar>& operator=(Scalar value); 
-        ErrorTracer<Scalar>& operator+=(const ErrorTracer& x); 
-        ErrorTracer<Scalar>& operator-=(const ErrorTracer& x); 
-        ErrorTracer<Scalar>& operator*=(const ErrorTracer& x); 
-        ErrorTracer<Scalar>& operator/=(const ErrorTracer& x); 
+        ErrorTracer<T>& operator=(T value); 
+        ErrorTracer<T>& operator+=(const ErrorTracer& x); 
+        ErrorTracer<T>& operator-=(const ErrorTracer& x); 
+        ErrorTracer<T>& operator*=(const ErrorTracer& x); 
+        ErrorTracer<T>& operator/=(const ErrorTracer& x); 
         
     private:
-        Scalar mValue; // the value of the scalar
-        Scalar mError; // an upper bound for the relative rounding error
+        T mValue;
+        T mError;
     };
 
-// `mError' times the machine epsilon (FLT_EPSILON for floats, DBL_EPSILON for doubles) 
-// gives an estimated upper bound for the rounding error in `mValue'.
-// The number of dirty bits in the mantissa is `log(mError) / log(2)', so if `mError'
-// reaches 2^24 = 16777216 then we used up all bits in the mantissa of a float. 
-// Note that the error is a rough upper bound. In reality i386 platforms may 
-// evaluate compound expressions in higher precision, so the given machine epsilon
-// is usually too large.   
-
-    template <typename Scalar> ErrorTracer<Scalar> operator-(const ErrorTracer<Scalar>& x);
-    template <typename Scalar> ErrorTracer<Scalar> operator+(const ErrorTracer<Scalar>& x,  const ErrorTracer<Scalar>& y);
-    template <typename Scalar> ErrorTracer<Scalar> operator-(const ErrorTracer<Scalar>& x,  const ErrorTracer<Scalar>& y);
-    template <typename Scalar> ErrorTracer<Scalar> operator*(const ErrorTracer<Scalar>& x,  const ErrorTracer<Scalar>& y);
-    template <typename Scalar> ErrorTracer<Scalar> operator/(const ErrorTracer<Scalar>& x,  const ErrorTracer<Scalar>& y);
+    template <typename T> ErrorTracer<T> operator-(const ErrorTracer<T>& x);
+    template <typename T> ErrorTracer<T> operator+(const ErrorTracer<T>& x,  const ErrorTracer<T>& y);
+    template <typename T> ErrorTracer<T> operator-(const ErrorTracer<T>& x,  const ErrorTracer<T>& y);
+    template <typename T> ErrorTracer<T> operator*(const ErrorTracer<T>& x,  const ErrorTracer<T>& y);
+    template <typename T> ErrorTracer<T> operator/(const ErrorTracer<T>& x,  const ErrorTracer<T>& y);
  
 #ifdef USE_OSTREAM
 
-    template <typename CharT, typename Traits, typename Scalar> 
-    std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const ErrorTracer<Scalar>& x);
+    template <typename CharT, typename Traits, typename T> 
+    std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const ErrorTracer<T>& x);
     
 #endif
 
-    template <typename Scalar> ErrorTracer<Scalar> sqrt(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> abs(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> cos(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> sin(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> tan(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> acos(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> asin(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> atan(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> atan2(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y); 
-    template <typename Scalar> ErrorTracer<Scalar> exp(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> log(const ErrorTracer<Scalar>& x); 
-    template <typename Scalar> ErrorTracer<Scalar> pow(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y); 
+    template <typename T> ErrorTracer<T> abs(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> acos(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> asin(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> atan(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> atan2(const ErrorTracer<T>& x, const ErrorTracer<T>& y); 
+    template <typename T> ErrorTracer<T> cos(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> exp(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> log(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> pow(const ErrorTracer<T>& x, const ErrorTracer<T>& y); 
+    template <typename T> ErrorTracer<T> sin(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> sqrt(const ErrorTracer<T>& x); 
+    template <typename T> ErrorTracer<T> tan(const ErrorTracer<T>& x);
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>::ErrorTracer() 
-        : mValue()
-        , mError()
-    {}
-
-    template <typename Scalar>
-    template <typename Scalar2>
-    FORCEINLINE
-    ErrorTracer<Scalar>::ErrorTracer(Scalar2 value) 
-        : mValue(Scalar(value))
-        , mError() 
-    {}
-
-    template <typename Scalar>
-    FORCEINLINE
-    ErrorTracer<Scalar>::ErrorTracer(Scalar value, Scalar error) 
+    ErrorTracer<T>::ErrorTracer(T value, T error) 
         : mValue(value)
         , mError(error) 
     {}
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    Scalar ErrorTracer<Scalar>::value() const 
+    T ErrorTracer<T>::value() const 
     {
         return mValue; 
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    Scalar ErrorTracer<Scalar>::error() const
-    { 
+    T ErrorTracer<T>::error() const
+    {  
         return mError; 
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    void ErrorTracer<Scalar>::setError(Scalar error)
-    { 
-        mError = error; 
+    T ErrorTracer<T>::maxRelativeError() const
+    {  
+        T gMachineEpsilon = std::numeric_limits<T>::epsilon() * T(0.5);
+
+        return mError * gMachineEpsilon; 
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>::operator Scalar() const
+    T ErrorTracer<T>::dirtyBits() const
+    { 
+        return log2(mError); 
+    }
+
+    template <typename T>
+    FORCEINLINE
+    ErrorTracer<T>::operator T() const
     { 
         return mValue; 
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>& ErrorTracer<Scalar>::operator=(Scalar value) 
+    ErrorTracer<T>& ErrorTracer<T>::operator=(T value) 
     {
         mValue = value;
-        mError = Scalar();
+        mError = T();
         return *this;
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>& ErrorTracer<Scalar>::operator+=(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T>& ErrorTracer<T>::operator+=(const ErrorTracer<T>& x) 
     {
         *this = *this + x;
         return *this;
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>& ErrorTracer<Scalar>::operator-=(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T>& ErrorTracer<T>::operator-=(const ErrorTracer<T>& x) 
     {
         *this = *this - x;
         return *this;
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>& ErrorTracer<Scalar>::operator*=(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T>& ErrorTracer<T>::operator*=(const ErrorTracer<T>& x) 
     {
         *this = *this * x;
         return *this;
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar>& ErrorTracer<Scalar>::operator/=(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T>& ErrorTracer<T>::operator/=(const ErrorTracer<T>& x) 
     {
         *this = *this / x;
         return *this;
     }
 
-
-    
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> operator-(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T> operator-(const ErrorTracer<T>& x) 
     {
-        return ErrorTracer<Scalar>(-x.value(), 
+        return ErrorTracer<T>(-x.value(), 
                                     x.error());
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE 
-    ErrorTracer<Scalar> operator+(const ErrorTracer<Scalar>& x,  const ErrorTracer<Scalar>& y) 
+    ErrorTracer<T> operator+(const ErrorTracer<T>& x,  const ErrorTracer<T>& y) 
     {
-        Scalar value = x.value() + y.value();
-        return ErrorTracer<Scalar>(value, 
-                                   !iszero(value) ? (abs(x.value()) * x.error() + abs(y.value()) * y.error()) / abs(value) + Scalar(1) : Scalar());
+        T value = x.value() + y.value();
+        return ErrorTracer<T>(value, 
+                                   !iszero(value) ? (abs(x.value()) * x.error() + abs(y.value()) * y.error()) / abs(value) + T(1) : T());
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> operator-(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y) 
+    ErrorTracer<T> operator-(const ErrorTracer<T>& x, const ErrorTracer<T>& y) 
     {
-        Scalar value = x.value() - y.value();
-        return ErrorTracer<Scalar>(value,
-                                   !iszero(value) ? (abs(x.value()) * x.error() + abs(y.value()) * y.error()) / abs(value) + Scalar(1) : Scalar());
+        T value = x.value() - y.value();
+        return ErrorTracer<T>(value,
+                                   !iszero(value) ? (abs(x.value()) * x.error() + abs(y.value()) * y.error()) / abs(value) + T(1) : T());
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE 
-    ErrorTracer<Scalar> operator*(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y)
+    ErrorTracer<T> operator*(const ErrorTracer<T>& x, const ErrorTracer<T>& y)
     {
-        return ErrorTracer<Scalar>(x.value() * y.value(), 
-                                    x.error() + y.error() + Scalar(1));
+        return ErrorTracer<T>(x.value() * y.value(), 
+                                    x.error() + y.error() + T(1));
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> operator/(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y) 
+    ErrorTracer<T> operator/(const ErrorTracer<T>& x, const ErrorTracer<T>& y) 
     {
-        return ErrorTracer<Scalar>(x.value() / y.value(), 
-                                    x.error() + y.error() + Scalar(1));
+        return ErrorTracer<T>(x.value() / y.value(), 
+                                    x.error() + y.error() + T(1));
     }
     
 #ifdef USE_OSTREAM
 
-    template <typename CharT, typename Traits, typename Scalar> 
+    template <typename CharT, typename Traits, typename T> 
     FORCEINLINE 
-    std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const ErrorTracer<Scalar>& x) 
+    std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const ErrorTracer<T>& x) 
     {
         return os << x.value() << '[' << x.error() << ']';
     }
     
 #endif
 
-    template <typename Scalar>
-    FORCEINLINE 
-    ErrorTracer<Scalar> sqrt(const ErrorTracer<Scalar>& x) 
+    template <typename T>
+    FORCEINLINE
+    ErrorTracer<T> abs(const ErrorTracer<T>& x) 
     {
-        return ErrorTracer<Scalar>(sqrt(x.value()), x.error() * Scalar(0.5) + Scalar(1));
+        return ErrorTracer<T>(abs(x.value()), x.error());
     }
     
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> abs(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T> acos(const ErrorTracer<T>& x) 
     {
-        return ErrorTracer<Scalar>(abs(x.value()), x.error());
-    }
-    
-    template <typename Scalar>
-    FORCEINLINE
-    ErrorTracer<Scalar> cos(const ErrorTracer<Scalar>& x) 
-    {
-        return ErrorTracer<Scalar>(cos(x.value()), x.error() + Scalar(1));
+        return ErrorTracer<T>(acos(x.value()), x.error() + T(1));
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> sin(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T> asin(const ErrorTracer<T>& x) 
     {
-        return ErrorTracer<Scalar>(sin(x.value()), x.error() + Scalar(1));
+        return ErrorTracer<T>(asin(x.value()), x.error() + T(1));
     }
 
-    template <typename Scalar>
+    template <typename T>
+    FORCEINLINE
+    ErrorTracer<T> atan(const ErrorTracer<T>& x) 
+    {
+        return ErrorTracer<T>(atan(x.value()), x.error() + T(1));
+    }
+
+    template <typename T>
     FORCEINLINE 
-    ErrorTracer<Scalar> tan(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T> atan2(const ErrorTracer<T>& x, const ErrorTracer<T>& y) 
     {
-        Scalar value = tan(x.value());
-        return ErrorTracer<Scalar>(value, (Scalar(1) + value * value) * x.error() + Scalar(1));
+        return ErrorTracer<T>(atan2(x.value(), y.value()), x.error() + y.error() + T(1));
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> acos(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T> cos(const ErrorTracer<T>& x) 
     {
-        return ErrorTracer<Scalar>(acos(x.value()), x.error() + Scalar(1));
+        return ErrorTracer<T>(cos(x.value()), x.error() + T(1));
     }
 
-    template <typename Scalar>
-    FORCEINLINE
-    ErrorTracer<Scalar> asin(const ErrorTracer<Scalar>& x) 
-    {
-        return ErrorTracer<Scalar>(asin(x.value()), x.error() + Scalar(1));
-    }
-
-    template <typename Scalar>
-    FORCEINLINE
-    ErrorTracer<Scalar> atan(const ErrorTracer<Scalar>& x) 
-    {
-        return ErrorTracer<Scalar>(atan(x.value()), x.error() + Scalar(1));
-    }
-
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE 
-    ErrorTracer<Scalar> atan2(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y) 
+    ErrorTracer<T> exp(const ErrorTracer<T>& x) 
     {
-        return ErrorTracer<Scalar>(atan2(x.value(), y.value()), x.error() + y.error() + Scalar(1));
+        T value = exp(x.value());
+        return ErrorTracer<T>(value, value * x.error() + T(1));
     }
 
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE 
-    ErrorTracer<Scalar> exp(const ErrorTracer<Scalar>& x) 
+    ErrorTracer<T> log(const ErrorTracer<T>& x) 
     {
-        Scalar value = exp(x.value());
-        return ErrorTracer<Scalar>(value, value * x.error() + Scalar(1));
+        return ErrorTracer<T>(log(x.value()), x.error() / x.value() + T(1));
     }
 
-    template <typename Scalar>
-    FORCEINLINE 
-    ErrorTracer<Scalar> log(const ErrorTracer<Scalar>& x) 
-    {
-        return ErrorTracer<Scalar>(log(x.value()), x.error() / x.value() + Scalar(1));
-    }
-
-    template <typename Scalar>
+    template <typename T>
     FORCEINLINE
-    ErrorTracer<Scalar> pow(const ErrorTracer<Scalar>& x, const ErrorTracer<Scalar>& y) 
+    ErrorTracer<T> pow(const ErrorTracer<T>& x, const ErrorTracer<T>& y) 
     {
         ASSERT(!isnegative(x.value()));
-        Scalar value = pow(x.value(), y.value());
-        return ErrorTracer<Scalar>(value, abs(y.value()) * x.error() + abs(value * log(x.value())) * y.error() + Scalar(1));
+        T value = pow(x.value(), y.value());
+        return ErrorTracer<T>(value, abs(y.value()) * x.error() + abs(value * log(x.value())) * y.error() + T(1));
     }
 
-    template <typename Scalar>
-    struct ScalarTraits<ErrorTracer<Scalar> > 
+    template <typename T>
+    FORCEINLINE
+    ErrorTracer<T> sin(const ErrorTracer<T>& x) 
     {
-        static FORCEINLINE ErrorTracer<Scalar> pi()
+        return ErrorTracer<T>(sin(x.value()), x.error() + T(1));
+    }
+
+    template <typename T>
+    FORCEINLINE 
+    ErrorTracer<T> sqrt(const ErrorTracer<T>& x) 
+    {
+        return ErrorTracer<T>(sqrt(x.value()), x.error() * T(0.5) + T(1));
+    }
+    
+    template <typename T>
+    FORCEINLINE 
+    ErrorTracer<T> tan(const ErrorTracer<T>& x) 
+    {
+        T value = tan(x.value());
+        return ErrorTracer<T>(value, (T(1) + value * value) * x.error() + T(1));
+    }
+
+    template <typename T>
+    struct ScalarTraits<ErrorTracer<T> > 
+    {
+        static FORCEINLINE ErrorTracer<T> pi()
         {
-            return ErrorTracer<Scalar>(ScalarTraits<Scalar>::pi());
+            return ErrorTracer<T>(ScalarTraits<T>::pi());
         }
         
-        static FORCEINLINE ErrorTracer<Scalar> infinity()
+        static FORCEINLINE ErrorTracer<T> infinity()
         {
-            return ErrorTracer<Scalar>(ScalarTraits<Scalar>::infinity());
+            return ErrorTracer<T>(ScalarTraits<T>::infinity());
         }
 
-        static FORCEINLINE ErrorTracer<Scalar> epsilon()
+        static FORCEINLINE ErrorTracer<T> epsilon()
         {
-            return ErrorTracer<Scalar>(ScalarTraits<Scalar>::epsilon());
+            return ErrorTracer<T>(ScalarTraits<T>::epsilon());
         }
     };
+}
 
+namespace std
+{
+    template <typename T>
+    class numeric_limits<mt::ErrorTracer<T> >
+    {
+    public:
+        static mt::ErrorTracer<T> min() { return mt::ErrorTracer<T>(numeric_limits<T>::min()); }
+        static mt::ErrorTracer<T> max() { return mt::ErrorTracer<T>(numeric_limits<T>::max()); }
+        static mt::ErrorTracer<T> epsilon() { return mt::ErrorTracer<T>(numeric_limits<T>::epsilon()); }
+        static mt::ErrorTracer<T> round_error() { return mt::ErrorTracer<T>(numeric_limits<T>::round_error()); }
+        static mt::ErrorTracer<T> infinity() { return mt::ErrorTracer<T>(numeric_limits<T>::infinity()); }
+        static mt::ErrorTracer<T> quiet_NaN() { return mt::ErrorTracer<T>(numeric_limits<T>::quiet_NaN()); }
+        static mt::ErrorTracer<T> signaling_NaN() { return mt::ErrorTracer<T>(numeric_limits<T>::signaling_NaN()); }
+        static mt::ErrorTracer<T> denorm_min() { return mt::ErrorTracer<T>(numeric_limits<T>::denorm_min()); }
+    };
 }
 
 #endif

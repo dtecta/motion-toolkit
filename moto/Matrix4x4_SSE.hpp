@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -20,7 +20,9 @@ namespace mt
         typedef float ScalarType;
 
         Matrix4x4();
+        Matrix4x4(Zero);
         Matrix4x4(Identity);
+        Matrix4x4(float s);
         template<typename Scalar2> explicit Matrix4x4(const Scalar2* v);   
         Matrix4x4(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3);
         Matrix4x4(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2, const Vector4<float>& r3);
@@ -32,7 +34,23 @@ namespace mt
         operator const Vector4<float>*() const; 
         operator Vector4<float>*();
 
+        Matrix4x4<float>& operator=(Zero);
+        Matrix4x4<float>& operator+=(Zero);
+        Matrix4x4<float>& operator-=(Zero);
+        Matrix4x4<float>& operator*=(Zero);
+
         Matrix4x4<float>& operator=(Identity);
+
+        Matrix4x4<float>& operator=(float s);
+        Matrix4x4<float>& operator*=(float s);
+        Matrix4x4<float>& operator/=(float s);
+        
+        Matrix4x4<float>& operator+=(const Matrix4x4<float>& a);
+        Matrix4x4<float>& operator-=(const Matrix4x4<float>& a);
+
+#if USE_MATRIX_COMP_MULT
+        Matrix4x4<float>& operator*=(const Matrix4x4<float>& a);
+#endif
   
         template <typename Scalar2> void setValue(const Scalar2* v);  
         void setColumns(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3);
@@ -63,13 +81,24 @@ namespace mt
     
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4() 
-    {} 
-    
+    {}
+
+    FORCEINLINE 
+    Matrix4x4<float>::Matrix4x4(Zero)
+    {
+        *this = Zero();
+    }
     
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(Identity)
     {
         *this = Identity();
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>::Matrix4x4(float s)
+    {
+        *this = s;
     }
 
     template <typename Scalar2>
@@ -79,14 +108,12 @@ namespace mt
         setValue(v);
     }
 
-    
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3)
     {
         setColumns(c0, c1, c2, c3);
     }
    
-
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Vector4<float>& r0, const Vector4<float>& r1, const Vector4<float>& r2, const Vector4<float>& r3)
     {
@@ -99,7 +126,6 @@ namespace mt
         setValue(r0, r1, r2, r3);
     }
 
-    
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Vector3<float>& p)
     {
@@ -109,7 +135,6 @@ namespace mt
         mRow[3] = Unit<3>();
     }
 
-    
     FORCEINLINE 
     Matrix4x4<float>::Matrix4x4(const Matrix3x3<float>& a, const Vector3<float>& p)
     {
@@ -141,6 +166,34 @@ namespace mt
     } 
     
     FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator=(Zero)
+    {
+        mRow[0] = Zero();
+        mRow[1] = Zero();
+        mRow[2] = Zero();   
+        mRow[3] = Zero();
+        return *this;
+    }
+     
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator+=(Zero)
+    {
+        return *this;
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator-=(Zero)
+    {
+        return *this;
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator*=(Zero)
+    {
+        return *this = Zero();
+    }
+
+    FORCEINLINE 
     Matrix4x4<float>& Matrix4x4<float>::operator=(Identity)
     {
         mRow[0] = Unit<0>();
@@ -150,12 +203,71 @@ namespace mt
         return *this;
     }
 
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator=(float s)
+    {
+        mRow[0] = Vector4<float>(s, 0.0f, 0.0f, 0.0f);
+        mRow[1] = Vector4<float>(0.0f, s, 0.0f, 0.0f);
+        mRow[2] = Vector4<float>(0.0f, 0.0f, s, 0.0f);
+        mRow[3] = Vector4<float>(0.0f, 0.0f, 0.0f, s);
+        return *this;
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator*=(float s)
+    {
+        mRow[0] *= s; 
+        mRow[1] *= s; 
+        mRow[2] *= s;
+        mRow[3] *= s;
+        return *this;
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator/=(float s)
+    {
+        ASSERT(!iszero(s));
+        return *this *= 1.0f / s;
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator+=(const Matrix4x4<float>& a)
+    {
+        mRow[0] += a[0]; 
+        mRow[1] += a[1]; 
+        mRow[2] += a[2];
+        mRow[3] += a[3];
+        return *this;
+    }
+
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator-=(const Matrix4x4<float>& a)
+    {
+        mRow[0] -= a[0]; 
+        mRow[1] -= a[1]; 
+        mRow[2] -= a[2];
+        mRow[3] -= a[3];
+        return *this;
+    }
+
+#if USE_MATRIX_COMP_MULT
+    FORCEINLINE 
+    Matrix4x4<float>& Matrix4x4<float>::operator*=(const Matrix4x4<float>& a)
+    {
+        mRow[0] *= a[0]; 
+        mRow[1] *= a[1]; 
+        mRow[2] *= a[2];
+        mRow[3] *= a[3];
+        return *this;
+    }
+#endif
+
     template <typename Scalar2>
     FORCEINLINE
     void Matrix4x4<float>::setValue(const Scalar2* v)
     {
         mRow[0] = Vector4<float>(float(v[0]), float(v[4]), float(v[8]), float(v[12])); 
-		mRow[1] = Vector4<float>(float(v[1]), float(v[5]), float(v[9]), float(v[13])); 
+        mRow[1] = Vector4<float>(float(v[1]), float(v[5]), float(v[9]), float(v[13])); 
         mRow[2] = Vector4<float>(float(v[2]), float(v[6]), float(v[10]), float(v[14])); 
         mRow[3] = Vector4<float>(float(v[3]), float(v[7]), float(v[11]), float(v[15])); 
     }  
@@ -269,8 +381,8 @@ namespace mt
     {
         __m128 result = _mm_mul_ps(MT_SPLAT(v.vec, 0), a[0].vec);
         result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 1), a[1].vec));
-		result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 2), a[2].vec));
-		result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 3), a[3].vec));
+        result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 2), a[2].vec));
+        result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 3), a[3].vec));
 
         return Vector4<float>(result);
     }

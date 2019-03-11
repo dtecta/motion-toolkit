@@ -6,10 +6,10 @@
     http://opensource.org/licenses/MIT
 */
 
-#include "EulerAnglesJointLimits.hpp"
-#include "SwingTwistJointLimits.hpp"
-#include "EllipsoidJointLimits.hpp"
-#include "EllipticCylinderJointLimits.hpp"
+#include "jointlimits/EulerAnglesJointLimits.hpp"
+#include "jointlimits/SwingTwistJointLimits.hpp"
+#include "jointlimits/EllipsoidJointLimits.hpp"
+#include "jointlimits/EllipticCylinderJointLimits.hpp"
 
 
 using namespace ik;
@@ -163,14 +163,4 @@ TEST(RotationalJointLimits, SingleAxis)
 
     EllipsoidJointLimits ellipsoid(mt::radians<Scalar>(30), mt::radians<Scalar>(45), mt::radians<Scalar>(60));
     testSingleAxis(ellipsoid);
-}
-
-
-
-GTEST_API_ int main(int argc, char **argv) 
-{
-    testing::InitGoogleTest(&argc, argv);
-
-    int result = RUN_ALL_TESTS();
-    return result;
 }

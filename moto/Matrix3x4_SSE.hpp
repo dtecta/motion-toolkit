@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -136,15 +136,15 @@ namespace mt
     FORCEINLINE
     void Matrix3x4<float>::setValue(const Scalar2* v)
     {
-		mRow[0] = Vector4<float>(float(v[0]), float(v[4]), float(v[8]), float(v[12])); 
-		mRow[1] = Vector4<float>(float(v[1]), float(v[5]), float(v[9]), float(v[13])); 
+        mRow[0] = Vector4<float>(float(v[0]), float(v[4]), float(v[8]), float(v[12])); 
+        mRow[1] = Vector4<float>(float(v[1]), float(v[5]), float(v[9]), float(v[13])); 
         mRow[2] = Vector4<float>(float(v[2]), float(v[6]), float(v[10]), float(v[14])); 
     }  
 
     FORCEINLINE 
     void Matrix3x4<float>::setColumns(const Vector3<float>& c0, const Vector3<float>& c1, const Vector3<float>& c2, const Vector3<float>& c3)
     {
-		mRow[0] = Vector4<float>(c0.x, c1.x, c2.x, c3.x);
+        mRow[0] = Vector4<float>(c0.x, c1.x, c2.x, c3.x);
         mRow[1] = Vector4<float>(c0.y, c1.y, c2.y, c3.y);
         mRow[2] = Vector4<float>(c0.z, c1.z, c2.z, c3.z);
     }
@@ -157,7 +157,7 @@ namespace mt
         mRow[2] = r2;
     }
 
-	FORCEINLINE 
+    FORCEINLINE 
     void Matrix3x4<float>::setValue(const __m128& r0, const __m128& r1, const __m128& r2)
     {
         mRow[0] = r0;
@@ -186,7 +186,7 @@ namespace mt
     FORCEINLINE 
     void Matrix3x4<float>::setColumn(int j, const Vector3<float>& v)
     {
-		mRow[0][j] = v.x;
+        mRow[0][j] = v.x;
         mRow[1][j] = v.y;
         mRow[2][j] = v.z;
     }
@@ -205,11 +205,8 @@ namespace mt
         mRow[i] = v;
     }
 
-          
-  
 
-
-	FORCEINLINE 
+    FORCEINLINE 
     Vector3<float> mul(const Matrix3x4<float>& a, const Vector4<float>& v)
     {
         __m128 tmp0 = _mm_mul_ps(a[0].vec, v.vec);
@@ -223,13 +220,13 @@ namespace mt
     }
 
 
-	FORCEINLINE 
+    FORCEINLINE 
     Vector4<float> mul(const Vector4<float>& v, const Matrix3x4<float>& a)
     {
         __m128 result = _mm_mul_ps(MT_SPLAT(v.vec, 0), a[0].vec);
         result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 1), a[1].vec));
-		result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 2), a[2].vec));
-		result = _mm_add_ps(result, _mm_setr_ps(float(), float(), float(), v.w));
+        result = _mm_add_ps(result, _mm_mul_ps(MT_SPLAT(v.vec, 2), a[2].vec));
+        result = _mm_add_ps(result, _mm_setr_ps(0.0f, 0.0f, 0.0f, v.w));
         return Vector4<float>(result);
     }
 }

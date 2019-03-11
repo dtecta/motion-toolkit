@@ -1,5 +1,5 @@
 /*  Guts - Generic Utilities 
-    Copyright (c) 2006 Gino van den Bergen, DTECTA 
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA 
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 

@@ -1,6 +1,5 @@
 
-
-add_executable(moto
+set(MOTO_HDRS
   Algebra.hpp
   BBox3.hpp
   BitMask4.hpp
@@ -17,6 +16,7 @@ add_executable(moto
   Matrix3x3.hpp
   Matrix3x4.hpp
   Matrix3x4_SSE.hpp
+  Matrix4x3.hpp
   Matrix4x4.hpp
   Matrix4x4_SSE.hpp
   Metric.hpp
@@ -29,13 +29,9 @@ add_executable(moto
   Vector3.hpp
   Vector4.hpp
   Vector4_SSE.hpp
-  UnitTest.cpp
 )
 
-set(MOTO_DEPS consolid gtest)
-add_dependencies(${MOTO_DEPS}) 
-set_target_properties(moto PROPERTIES DEBUG_POSTFIX _d)
-target_link_libraries(moto ${MOTO_DEPS})
-if(UNIX)
-target_link_libraries(moto pthread)
+if(MSVC)
+   add_custom_target(moto SOURCES ${MOTO_HDRS})
 endif()
+

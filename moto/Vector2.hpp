@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -16,6 +16,8 @@
 #ifdef USE_ISTREAM
 #include <istream>
 #endif
+
+#include <guts/TypeTraits.hpp>
 
 #include <moto/Promote.hpp>
 #include <moto/Scalar.hpp>
@@ -460,6 +462,11 @@ namespace mt
     {
         return isfinite(a.x) && isfinite(a.y); 
     }
+}
+  
+namespace guts
+{
+    template <typename Scalar> struct TypeTraits<mt::Vector2<Scalar> > { enum { ID = TypeTraits<Scalar>::ID | TT_2 }; };
 }
 
 #endif

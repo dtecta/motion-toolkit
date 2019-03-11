@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -102,11 +102,14 @@ namespace mt
     
     template <typename Scalar1, typename Scalar2> 
     Vector3<typename Promote<Scalar1, Scalar2>::RT> cross(const Vector3<Scalar1>& a, const Vector3<Scalar2>& b);
-  
+
     template <typename Scalar>
     Scalar triple(const Vector3<Scalar>& a, const Vector3<Scalar>& b, const Vector3<Scalar>& c);
-   
-    template <typename Scalar> Vector3<Scalar> abs(const Vector3<Scalar>& a);  
+
+    template <typename Scalar>
+    Vector3<Scalar> normal(const Vector3<Scalar>& a, const Vector3<Scalar>& b, const Vector3<Scalar>& c);
+
+    template <typename Scalar> Vector3<Scalar> abs(const Vector3<Scalar>& a);
 
     template <typename Scalar> int maxAxis(const Vector3<Scalar>& a);
     template <typename Scalar> int minAxis(const Vector3<Scalar>& a);
@@ -116,13 +119,11 @@ namespace mt
 
     template <typename Scalar1, typename Scalar2>
     bool dominates(const Vector3<Scalar1>& a, const Vector3<Scalar2>& b);
-  
+
     template <typename Scalar1, typename Scalar2>
     void convert(Scalar1* v, const Vector3<Scalar2>& a);
 
     template <typename Scalar> bool isfinite(const Vector3<Scalar>& a);
- 
- 
 
 
     template <typename Scalar>
@@ -431,11 +432,48 @@ namespace mt
     FORCEINLINE 
     Scalar triple(const Vector3<Scalar>& a, const Vector3<Scalar>& b, const Vector3<Scalar>& c)
     {
-        return a.x * (b.y * c.z - b.z * c.y) +
-               a.y * (b.z * c.x - b.x * c.z) +
-               a.z * (b.x * c.y - b.y * c.x);
+#if SPEED_OVER_ACCURACY
+        return dot(a, cross(b, c));
+#else
+        Vector3<Scalar> e[3];
+
+        e[0] = a;
+        e[1] = b;
+        e[2] = c;
+
+        Vector3<Scalar> d(dot(e[0], e[0]),
+                          dot(e[1], e[1]),
+                          dot(e[2], e[2]));
+
+        int axis = maxAxis(d);
+
+        return dot(e[axis], cross(e[(axis + 1) % 3], e[(axis + 2) % 3]));
+#endif
     }
-    
+
+    template <typename Scalar>
+    FORCEINLINE 
+    Vector3<Scalar> normal(const Vector3<Scalar>& a, const Vector3<Scalar>& b, const Vector3<Scalar>& c)
+    {
+#if SPEED_OVER_ACCURACY
+        return cross(b - a, c - b);
+#else
+        Vector3<Scalar> e[3];
+
+        e[0] = b - a;
+        e[1] = c - b;
+        e[2] = a - c;
+
+        Vector3<Scalar> d(dot(e[0], e[0]),
+                          dot(e[1], e[1]),
+                          dot(e[2], e[2]));
+
+        int axis = maxAxis(d);
+
+        return cross(e[(axis + 1) % 3], e[(axis + 2) % 3]);
+#endif
+    }
+
     template <typename Scalar>
     FORCEINLINE
     Vector3<Scalar> abs(const Vector3<Scalar>& a)
@@ -503,6 +541,11 @@ namespace mt
     {
         return isfinite(a.x) && isfinite(a.y) && isfinite(a.z); 
     }
+}
+
+namespace guts
+{
+    template <typename Scalar> struct TypeTraits<mt::Vector3<Scalar> > { enum { ID = TypeTraits<Scalar>::ID | TT_3 }; };
 }
 
 #endif

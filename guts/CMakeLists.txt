@@ -1,5 +1,6 @@
-add_executable(guts
+set(GUTS_HDRS
   Allocator.hpp
+  BinomialQueue.hpp  
   Deque.hpp
   Endian.hpp
   FileUtils.hpp
@@ -12,24 +13,26 @@ add_executable(guts
   MemAllocLog.hpp
   Memory.hpp
   Meta.hpp
+  Observer.hpp
   PriorityQueue.hpp
   Queue.hpp
   RefPtr.hpp
   RuntimeError.hpp
-  SStream.hpp
+  Serialization.hpp
   Set.hpp
   SharedPtr.hpp
   Singleton.hpp
   SpatialHash.hpp
-  StaticAssert.hpp 
+  SStream.hpp
+  StaticAssert.hpp
+  Stream.hpp
   String.hpp
+  Syntax.hpp
+  TypeTraits.hpp
   UniquePtr.hpp
-  UnitTest.cpp
   Vector.hpp
 )
 
-set(GUTS_DEPS consolid gtest)
-add_dependencies(${GUTS_DEPS})
-set_target_properties(guts PROPERTIES DEBUG_POSTFIX _d)
-target_link_libraries(guts ${GUTS_DEPS})
-
+if(MSVC)
+   add_custom_target(guts SOURCES ${GUTS_HDRS})
+endif()

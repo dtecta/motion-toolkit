@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -76,7 +76,7 @@ namespace mt
         typedef float ScalarType; 
       
         Vector4(); 
-        Vector4(float x, float y, float z, float w = float());   
+        Vector4(float x, float y, float z, float w = 0.0f);   
         explicit Vector4(__m128 v); 
         explicit Vector4(const float* v);  
 
@@ -85,7 +85,7 @@ namespace mt
         template <int I> Vector4(Unit<I>); 
         template <typename Scalar2> explicit Vector4(const Scalar2* v);  
         template <typename Scalar2> Vector4(const Vector4<Scalar2>& a);  
-        template <typename Scalar2> explicit Vector4(const Vector3<Scalar2>& a, float w = float());   
+        template <typename Scalar2> explicit Vector4(const Vector3<Scalar2>& a, float w = 0.0f);   
         explicit Vector4(float w);
 
         operator const float*() const;
@@ -194,7 +194,7 @@ namespace mt
 
     FORCEINLINE
     Vector4<float>::Vector4(Identity)      
-        : vec(_mm_setr_ps(float(), float(), float(), float(1)))
+        : vec(_mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f))
     {}
     
     template <int I>
@@ -223,7 +223,7 @@ namespace mt
    
     FORCEINLINE
     Vector4<float>::Vector4(float w)
-        : vec(_mm_setr_ps(float(), float(), float(), w))
+        : vec(_mm_setr_ps(0.0f, 0.0f, 0.0f, w))
     {}
 
     FORCEINLINE
@@ -267,10 +267,10 @@ namespace mt
     FORCEINLINE
     Vector4<float>& Vector4<float>::operator=(Identity)
     {
-        vec = _mm_setr_ps(float(), float(), float(), float(1));
+        vec = _mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f);
         return *this;
     }
-     
+
     template <int I>
     FORCEINLINE
     Vector4<float>& Vector4<float>::operator=(Unit<I>)

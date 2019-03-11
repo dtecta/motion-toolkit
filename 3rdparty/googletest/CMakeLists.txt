@@ -1,5 +1,5 @@
 include_directories(
-	${PROJECT_SOURCE_DIR}/3rdparty/googletest
+	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_library(gtest

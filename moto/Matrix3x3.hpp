@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -8,6 +8,8 @@
 
 #ifndef MT_MATRIX3X3_HPP
 #define MT_MATRIX3X3_HPP
+
+#include <guts/TypeTraits.hpp>
 
 #include <moto/Vector3.hpp>
 #include <moto/Vector4.hpp>
@@ -32,7 +34,7 @@ namespace mt
         Matrix3x3(Identity); 
         Matrix3x3(Scalar s);
         template <typename Scalar2> explicit Matrix3x3(const Scalar2* v);   
-        Matrix3x3(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2);
+        Matrix3x3(const Vector3<Scalar>& r0, const Vector3<Scalar>& r1, const Vector3<Scalar>& r2);
         Matrix3x3(const Vector4<Scalar>& q); 
         Matrix3x3(const Diagonal3<Scalar>& d); 
        
@@ -62,9 +64,11 @@ namespace mt
         void setValue(Scalar a00, Scalar a01, Scalar a02, 
                       Scalar a10, Scalar a11, Scalar a12, 
                       Scalar a20, Scalar a21, Scalar a22);
-                
-        void setValue(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2);
+
         template <typename Scalar2> void setValue(const Scalar2* v);  
+
+        void setColumns(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2);
+        void setRows(const Vector3<Scalar>& r0, const Vector3<Scalar>& r1, const Vector3<Scalar>& r2);
 
         Matrix3x3<Scalar>& operator=(const Vector4<Scalar>& q);  
         Matrix3x3<Scalar>& operator=(const Diagonal3<Scalar>& d);
@@ -204,12 +208,11 @@ namespace mt
         setValue(v);
     }
 
-
     template <typename Scalar>
     FORCEINLINE 
-    Matrix3x3<Scalar>::Matrix3x3(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2)                   
+    Matrix3x3<Scalar>::Matrix3x3(const Vector3<Scalar>& r0, const Vector3<Scalar>& r1, const Vector3<Scalar>& r2)                   
     {
-        setValue(c0, c1, c2);
+        setRows(r0, r1, r2);
     }
    
     template <typename Scalar>
@@ -270,7 +273,6 @@ namespace mt
     {
         return *this = Zero();
     }
-
 
     template <typename Scalar>
     FORCEINLINE 
@@ -349,20 +351,11 @@ namespace mt
                                      Scalar a10, Scalar a11, Scalar a12, 
                                      Scalar a20, Scalar a21, Scalar a22)
     {
-        mRow[0] = Vector3<Scalar>(a00, a01, a02); 
-        mRow[1] = Vector3<Scalar>(a10, a11, a12); 
+        mRow[0] = Vector3<Scalar>(a00, a01, a02);
+        mRow[1] = Vector3<Scalar>(a10, a11, a12);
         mRow[2] = Vector3<Scalar>(a20, a21, a22);
     }
-        
-    template <typename Scalar>
-    FORCEINLINE 
-    void Matrix3x3<Scalar>::setValue(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2)                   
-    {
-        setValue(c0.x, c1.x, c2.x, 
-                 c0.y, c1.y, c2.y,
-                 c0.z, c1.z, c2.z);
-    }
-       
+
     template <typename Scalar>
     template <typename Scalar2> 
     FORCEINLINE
@@ -372,7 +365,25 @@ namespace mt
         mRow[1] = Vector3<Scalar>(Scalar(v[1]), Scalar(v[5]), Scalar(v[9])); 
         mRow[2] = Vector3<Scalar>(Scalar(v[2]), Scalar(v[6]), Scalar(v[10])); 
     }  
-      
+       
+    template <typename Scalar>
+    FORCEINLINE 
+    void Matrix3x3<Scalar>::setColumns(const Vector3<Scalar>& c0, const Vector3<Scalar>& c1, const Vector3<Scalar>& c2)
+    {
+        mRow[0] = Vector3<Scalar>(c0.x, c1.x, c2.x);
+        mRow[1] = Vector3<Scalar>(c0.y, c1.y, c2.y);
+        mRow[2] = Vector3<Scalar>(c0.z, c1.z, c2.z);
+    }
+
+    template <typename Scalar>
+    FORCEINLINE 
+    void Matrix3x3<Scalar>::setRows(const Vector3<Scalar>& r0, const Vector3<Scalar>& r1, const Vector3<Scalar>& r2)
+    {
+        mRow[0] = r0;
+        mRow[1] = r1;
+        mRow[2] = r2;
+    }
+
     template <typename Scalar>
     FORCEINLINE 
     Matrix3x3<Scalar>& Matrix3x3<Scalar>::operator=(const Vector4<Scalar>& q)
@@ -631,7 +642,9 @@ namespace mt
     FORCEINLINE 
     Matrix3x3<Scalar> transpose(const Matrix3x3<Scalar>& a)
     {
-        return Matrix3x3<Scalar>(a[0], a[1], a[2]);
+        return Matrix3x3<Scalar>(a[0][0], a[1][0], a[2][0],
+                                 a[0][1], a[1][1], a[2][1],
+                                 a[0][2], a[1][2], a[2][2]);
     }
 
     template <typename Scalar>
@@ -806,6 +819,12 @@ namespace mt
         v[2] = Scalar1(a[2][0]); v[6] = Scalar1(a[2][1]); v[10] = Scalar1(a[2][2]);  
     }
 
+}
+
+namespace guts
+{
+    template <> struct TypeTraits<mt::Matrix3x3<float> > { enum { ID = TT_FLOAT3 | TT_3 }; };
+    template <> struct TypeTraits<mt::Matrix3x3<double> > { enum { ID = TT_DOUBLE3 | TT_3 }; };
 }
 
 #endif

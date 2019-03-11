@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -8,6 +8,8 @@
 
 #ifndef MT_INTERVAL_HPP
 #define MT_INTERVAL_HPP
+
+#include <guts/TypeTraits.hpp>
 
 #include <moto/Promote.hpp>
 #include <moto/Scalar.hpp>
@@ -401,5 +403,9 @@ namespace mt
 #endif
 
 }
-
+namespace guts
+{
+    template <> struct TypeTraits<mt::Interval<float> > { enum { ID = TT_FLOAT2 }; };
+    template <> struct TypeTraits<mt::Interval<double> > { enum { ID = TT_DOUBLE2 }; };
+}
 #endif

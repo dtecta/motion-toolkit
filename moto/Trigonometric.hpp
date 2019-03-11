@@ -1,5 +1,5 @@
 /*  MoTo - Motion Toolkit
-    Copyright (c) 2006 Gino van den Bergen, DTECTA
+    Copyright (c) 2006-2019 Gino van den Bergen, DTECTA
 
     Source published under the terms of the MIT License. 
     For details please see COPYING file or visit 
@@ -20,14 +20,14 @@ namespace mt
 {
     template <typename Scalar> Scalar radians(Scalar degs);
     template <typename Scalar> Scalar degrees(Scalar rads);
-    
+
     template <typename Vector> typename Vector::ScalarType angle(const Vector& v1, const Vector& v2);
-    
+
     template <typename Vector, typename Scalar> 
     Vector slerp(const Vector& u1, const Vector& u2, typename Vector::ScalarType t); 
 
     template <typename Vector> typename Vector::ScalarType angle3(const Vector& v1, const Vector& v2);
-    
+
     template <typename Vector, typename Scalar> 
     Vector slerp3(const Vector& u1, const Vector& u2, typename Vector::ScalarType t); 
 
@@ -40,22 +40,15 @@ namespace mt
 
     template <typename Scalar> Vector4<Scalar> exp(const Vector3<Scalar>& v);
     template <typename Scalar> Vector3<Scalar> logUnit(const Vector4<Scalar>& u);
-	
-	template <typename Scalar1, typename Scalar2> 
-    Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t);
-      
+    template <typename Scalar1, typename Scalar2> Vector4<Scalar1> powUnit(const Vector4<Scalar1>& u, Scalar2 t);
+    template <typename Scalar1, typename Scalar2> Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t);
 
     template <typename Scalar> Vector4<Scalar> exp(const Vector4<Scalar>& q); 
     template <typename Scalar> Vector4<Scalar> log(const Vector4<Scalar>& q); 
-    
-    template <typename Scalar1, typename Scalar2> 
-    Vector4<Scalar1> logLerp(const Vector4<Scalar1>& q1, const Vector4<Scalar1>& q2, Scalar2 t);
+    template <typename Scalar1, typename Scalar2> Vector4<Scalar1> pow(const Vector4<Scalar1>& q, Scalar2 t);
+    template <typename Scalar1, typename Scalar2> Vector4<Scalar1> logLerp(const Vector4<Scalar1>& q1, const Vector4<Scalar1>& q2, Scalar2 t);
 
-    template <typename Scalar1, typename Scalar2> Vector4<Scalar1> integrate(const Vector4<Scalar1>& q0, const Vector3<Scalar1>& v, Scalar2 h);
-    template <typename Scalar1, typename Scalar2> Vector3<Scalar1> angvel(const Vector4<Scalar1>& q0, const Vector4<Scalar1>& q1, Scalar2 h);
-
-    template <typename Scalar>
-    Vector3<Scalar> dihedral(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2);
+    template <typename Scalar> Vector3<Scalar> dihedral(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2);
 
 
     template <typename Scalar>
@@ -63,7 +56,7 @@ namespace mt
     {
         static const Scalar RADS_PER_DEG = ScalarTraits<Scalar>::pi() / Scalar(180);
         return RADS_PER_DEG * degs;
-    } 
+    }
 
     template <typename Scalar>
     Scalar degrees(Scalar rads)
@@ -71,13 +64,13 @@ namespace mt
         static const Scalar DEGS_PER_RAD = Scalar(180) / ScalarTraits<Scalar>::pi();
         return DEGS_PER_RAD * rads;
     }
-    
+
     template <typename Vector>
     typename Vector::ScalarType angle(const Vector& v1, const Vector& v2)
     {
         return acos(dot(v1, v2) * rsqrt(lengthSquared(v1) * lengthSquared(v2)));
     }
-    
+
     template <typename Vector>
     Vector slerp(const Vector& u1, const Vector& u2, typename Vector::ScalarType t)
     {
@@ -95,14 +88,14 @@ namespace mt
         {
             return u1;
         }
-    }    
-    
+    }
+
     template <typename Vector>
     typename Vector::ScalarType angle3(const Vector& v1, const Vector& v2)
     {
         return acos(dot3(v1, v2) * rsqrt(lengthSquared3(v1) * lengthSquared3(v2)));
     }
-    
+
     template <typename Vector>
     Vector slerp3(const Vector& u1, const Vector& u2, typename Vector::ScalarType t)
     {
@@ -122,14 +115,13 @@ namespace mt
         }
     } 
 
-
     template <typename Scalar>
     FORCEINLINE 
     std::complex<Scalar> euler(Scalar theta)
     {
         return std::complex<Scalar>(cos(theta), sin(theta)); 
-    } 
-    
+    }
+
 #if HAVE_SINCOS
 
     FORCEINLINE 
@@ -157,7 +149,7 @@ namespace mt
     }
 
 #endif
-    
+
     template <typename Scalar>
     FORCEINLINE
     Vector4<Scalar> fromAxisAngle(const Vector3<Scalar>& axis, Scalar theta)
@@ -184,10 +176,19 @@ namespace mt
     FORCEINLINE
     void toAxisAngle(Vector3<Scalar>& axis, Scalar& theta, const Vector4<Scalar>& u)
     {
-        theta = acos(u.w) * Scalar(2);
-        axis = normalize(xyz(u));
+        Scalar s = length3(u);
+        if (!mt::iszero(s))
+        {
+            theta = atan2(s, u.w) * Scalar(2);
+            axis = xyz(u) / s;
+        }
+        else
+        {
+            theta = Scalar();
+            axis = Unit<0>();
+        }
     }
-    
+
     template <typename Scalar>
     Vector4<Scalar> exp(const Vector3<Scalar>& v)
     {
@@ -200,81 +201,55 @@ namespace mt
         }
         else
         {
-            return Identity();
+            return Vector4<Scalar>(v, Scalar(1));
         }
     }
-   
+
     template <typename Scalar>
     Vector3<Scalar> logUnit(const Vector4<Scalar>& u)
     {
-        Scalar theta = acos(u.w);
-        ASSERT(isfinite(theta));
-        return normalize(xyz(u)) * theta;
+        Scalar s = length3(u);
+        return mt::ispositive(s) ? xyz(u) * (atan2(s, u.w) / s) : xyz(u);
     }
 
-	template <typename Scalar1, typename Scalar2>
+    template <typename Scalar1, typename Scalar2>
+    Vector4<Scalar1> powUnit(const Vector4<Scalar1>& u, Scalar2 t)
+    {
+        return exp(logUnit(u) * t);  
+    }
+
+    template <typename Scalar1, typename Scalar2>
     Vector4<Scalar1> logLerpUnit(const Vector4<Scalar1>& u1, const Vector4<Scalar1>& u2, Scalar2 t)
     {
         return exp(lerp(logUnit(u1), logUnit(u2), t));  
     } 
     
-
     template <typename Scalar>
     Vector4<Scalar> exp(const Vector4<Scalar>& q)
     {
-        const Vector3<Scalar>& v = xyz(q); 
-        Scalar rho = exp(q.w); 
-        Scalar theta = length(v);
-        if (ispositive(theta))
-        {
-            std::complex<Scalar> c = rho * euler(theta); // polar
-            Scalar s = c.imag() / theta;
-            return Vector4<Scalar>(v * s, c.real());
-        }
-        else
-        {
-            return Vector4<Scalar>(Scalar(), Scalar(), Scalar(), rho);
-        }
+        return exp(xyz(q)) * exp(q.w);
     }
 
     template <typename Scalar>
     Vector4<Scalar> log(const Vector4<Scalar>& q)
     {
         Scalar r = length(q);
-        Scalar s = ispositive(r) ? q.w / r : Scalar();
-        Scalar theta = acos(s);
-        ASSERT(isfinite(theta));
-        return Vector4<Scalar>(normalize(xyz(q)) * theta, log(r));
+        ASSER(mt::ispositive(r));
+        return Vector4<Scalar>(logUnit(q / r), log(r));
     }
     
+    template <typename Scalar1, typename Scalar2>
+    Vector4<Scalar1> pow(const Vector4<Scalar1>& q, Scalar2 t)
+    {
+        return exp(log(q) * t);  
+    }
+
     template <typename Scalar1, typename Scalar2>
     Vector4<Scalar1> logLerp(const Vector4<Scalar1>& q1, const Vector4<Scalar1>& q2, Scalar2 t)
     {
         return exp(lerp(log(q1), log(q2), t));  
-    }  
-
-    template <typename Scalar1, typename Scalar2>
-    FORCEINLINE 
-    Vector4<Scalar1> integrate(const Vector4<Scalar1>& q0, const Vector3<Scalar1>& v, Scalar2 h)
-    {
-        return normalize(q0 + mul(v * (h * Scalar2(0.5)) , q0));
     }
 
-    template <typename Scalar1, typename Scalar2>
-    FORCEINLINE 
-    Vector3<Scalar1> angvel(const Vector4<Scalar1>& q0, const Vector4<Scalar1>& q1, Scalar2 h)
-    {
-        return xyz(mul(q1 - q0, conjugate(q0))) * (Scalar2(2) / h);
-    }
-
-    template <typename Scalar1, typename Scalar2>
-    FORCEINLINE 
-    Vector3<Scalar1> velocityLog(const Vector4<Scalar1>& q0, const Vector4<Scalar1>& q1, Scalar2 h)
-    {
-        Vector4<Scalar1> diff = mul(q1, conjugate(q0));
-        return logUnit(diff) * (Scalar2(2) / h);
-    }
-    
     template <typename Scalar>
     Vector3<Scalar> dihedral(const Vector3<Scalar>& u1, const Vector3<Scalar>& u2)
     {
@@ -335,7 +310,7 @@ namespace mt
                    Vector4<Scalar>(Scalar(), Scalar(), qroll.imag(), qroll.real()));
     }
 
-	template <typename Scalar>
+    template <typename Scalar>
     FORCEINLINE
     void toEuler(Scalar& yaw, Scalar& pitch, Scalar& roll, const Vector4<Scalar>& q)
     {
@@ -349,4 +324,3 @@ namespace mt
 }
 
 #endif
-
