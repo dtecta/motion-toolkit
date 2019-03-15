@@ -168,7 +168,7 @@ namespace mt
     ErrorTracer<T> operator-(const ErrorTracer<T>& x) 
     {
         return ErrorTracer<T>(-x.value(), 
-                                    x.error());
+                              x.error());
     }
     
     template <typename T>
@@ -176,8 +176,9 @@ namespace mt
     ErrorTracer<T> operator+(const ErrorTracer<T>& x,  const ErrorTracer<T>& y) 
     {
         T value = x.value() + y.value();
+        T error = abs(x.value()) * x.error() + abs(y.value()) * y.error();
         return ErrorTracer<T>(value, 
-                                   !iszero(value) ? (abs(x.value()) * x.error() + abs(y.value()) * y.error()) / abs(value) + T(1) : T());
+                              !iszero(value) ? error / abs(value) + T(1) : T());
     }
     
     template <typename T>
@@ -185,8 +186,9 @@ namespace mt
     ErrorTracer<T> operator-(const ErrorTracer<T>& x, const ErrorTracer<T>& y) 
     {
         T value = x.value() - y.value();
+        T error = abs(x.value()) * x.error() + abs(y.value()) * y.error();
         return ErrorTracer<T>(value,
-                                   !iszero(value) ? (abs(x.value()) * x.error() + abs(y.value()) * y.error()) / abs(value) + T(1) : T());
+                              !iszero(value) ? error / abs(value) + T(1) : T());
     }
     
     template <typename T>
@@ -194,7 +196,7 @@ namespace mt
     ErrorTracer<T> operator*(const ErrorTracer<T>& x, const ErrorTracer<T>& y)
     {
         return ErrorTracer<T>(x.value() * y.value(), 
-                                    x.error() + y.error() + T(1));
+                              x.error() + y.error() + T(1));
     }
     
     template <typename T>
@@ -202,7 +204,7 @@ namespace mt
     ErrorTracer<T> operator/(const ErrorTracer<T>& x, const ErrorTracer<T>& y) 
     {
         return ErrorTracer<T>(x.value() / y.value(), 
-                                    x.error() + y.error() + T(1));
+                              x.error() + y.error() + T(1));
     }
     
 #ifdef USE_OSTREAM
