@@ -37,6 +37,11 @@ namespace guts
             return mHeap.empty();
         }
 
+        Index count() const
+        {
+            return Index(mHeap.size());
+        }
+
         const Key& operator[](size_t i) const { return mHeap[i].first; }
 
         const Key& top() const { return mHeap.front().first; }
@@ -49,19 +54,21 @@ namespace guts
 
             *mHeap[hole].second = std::numeric_limits<Index>::max();
 
-            Index parent = (hole - 1) >> 1; 
             while (hole != 0)
             {
+                Index parent = (hole - 1) >> 1;
                 mHeap[hole] = mHeap[parent];
                 *mHeap[hole].second = Index(hole);
                 hole = parent;
-                parent = (hole - 1) >> 1;
             }
-              
-            Index last = Index(mHeap.size() - 1);
-            hole = adjustDown(last);
-            mHeap[hole] = mHeap[last];
-            *mHeap[hole].second = Index(hole);  
+
+            if (mHeap.size() > 1)
+            {
+                Index last = Index(mHeap.size() - 1);
+                hole = adjustDown(last);
+                mHeap[hole] = mHeap[last];
+                *mHeap[hole].second = Index(hole);
+            }
             mHeap.pop_back();  
         }
 
