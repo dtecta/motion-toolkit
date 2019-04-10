@@ -98,10 +98,13 @@ namespace guts
 
             *mHeap.front().second = std::numeric_limits<Index>::max();
 
-            Index last = Index(mHeap.size() - 1); 
-            Index hole = adjustDown(last);
-            mHeap[hole] = mHeap[last];
-            *mHeap[hole].second = Index(hole);  
+            if (mHeap.size() > 1)
+            {
+                Index last = Index(mHeap.size() - 1);
+                Index hole = adjustDown(last);
+                mHeap[hole] = mHeap[last];
+                *mHeap[hole].second = Index(hole);
+            }
             mHeap.pop_back();
         }      
         
