@@ -927,13 +927,13 @@ namespace mt
     FORCEINLINE 
     Matrix4x4<Scalar> frustum(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar zNear, Scalar zFar)
     {
-        Scalar oneOverWidth = 1 / (right - left);
-        Scalar oneOverHeight = 1 / (top - bottom); 
-        Scalar oneOverDepth = 1 / (zNear - zFar);
-        return Matrix4x4<Scalar>(Vector4<Scalar>(zNear * 2 * oneOverWidth, 0, (right + left) * oneOverWidth, 0),
-                                 Vector4<Scalar>(0, zNear * 2 * oneOverHeight, (top + bottom) * oneOverHeight, 0),
-                                 Vector4<Scalar>(0, 0, (zNear + zFar) * oneOverDepth, zNear * zFar * 2 * oneOverDepth),
-                                 Vector4<Scalar>(0, 0, -1, 0));
+        Scalar oneOverWidth = Scalar(1) / (right - left);
+        Scalar oneOverHeight = Scalar(1) / (top - bottom); 
+        Scalar oneOverDepth = Scalar(1) / (zNear - zFar);
+        return Matrix4x4<Scalar>(Vector4<Scalar>(zNear * Scalar(2) * oneOverWidth, Scalar(), (right + left) * oneOverWidth),
+                                 Vector4<Scalar>(Scalar(), zNear * Scalar(2) * oneOverHeight, (top + bottom) * oneOverHeight),
+                                 Vector4<Scalar>(Scalar(), Scalar(), (zNear + zFar) * oneOverDepth, zNear * zFar * Scalar(2) * oneOverDepth),
+                                 Vector4<Scalar>(Scalar(), Scalar(), Scalar(-1)));
     }
 
     template <typename Scalar1, typename Scalar2> 

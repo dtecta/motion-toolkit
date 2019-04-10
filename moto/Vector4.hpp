@@ -783,9 +783,8 @@ namespace mt
     FORCEINLINE
     Vector4<Scalar> plane(const Vector3<Scalar>& v0, const Vector3<Scalar>& v1, const Vector3<Scalar>& v2)
     {
-        Vector3<Scalar> normal = cross(v1 - v0, v2 - v0); 
-        return plane(normal, v0); 
-    }  
+        return plane(normal(v0, v1, v2), v0);
+    }
 
     template <typename Scalar1, typename Scalar2>
     FORCEINLINE
